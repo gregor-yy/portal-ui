@@ -1,0 +1,23 @@
+.container {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--system-transition-100);
+}
+
+.body {
+    background-color: var(--system-color-light-500);
+    padding: var(--system-spacing-400);
+    border-radius: var(--system-radius-200);
+}
+
+/* Transition animations */
+
+.container.enter {
+    pointer-events: inherit;
+    opacity: 1;
+}
