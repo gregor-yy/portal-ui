@@ -75,18 +75,6 @@ export function createOptimizedContext<T>() {
 
 				setValue(state);
 			});
-		});
-
-		useEffect(() => {
-			return store.subscribe(() => {
-				const state = selectorRef.current(store.getState());
-
-				if (valueRef.current === state) {
-					return;
-				}
-
-				setValue(state);
-			});
 		}, [store]);
 
 		return value;

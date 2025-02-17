@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { useDialog } from '@/shared/hooks';
@@ -22,7 +22,9 @@ interface ModalProps {
 }
 
 export const Modal: FC<ModalProps> = ({ isOpen, onClose, children, classes }) => {
-	const { transitionRef } = useDialog({ isOpen, onClose });
+	const transitionRef = useRef<HTMLDivElement | null>(null);
+
+	useDialog({ isOpen, onClose });
 
 	return (
 		<Transition nodeRef={transitionRef} in={isOpen} timeout={500} mountOnEnter unmountOnExit>

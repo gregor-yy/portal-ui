@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useId, useLayoutEffect } from 'react';
 
-import { generateId } from '../lib';
 import { useSelector, useUpdate } from '../store';
 
 interface UseDialogStackProps {
@@ -9,23 +8,16 @@ interface UseDialogStackProps {
 }
 
 export const useDialog = ({ isOpen, onClose }: UseDialogStackProps) => {
-	const transitionRef = useRef<HTMLDivElement | null>(null);
-	const id = useMemo(() => generateId(), []);
+	const id = useId();
 	const stack = useSelector((store) => store.dialogStack);
 	const update = useUpdate();
 
 	useEffect(() => {
-		if (isOpen) {
-			update({ dialogStack: [...stack, id] });
-		}
-	}, [isOpen, id, update]);
+		if (!isOpen) return;
 
-	useEffect(() => {
-		return () => {
-			if (isOpen) {
-				update({ dialogStack: stack.filter((item) => item !== id) });
-			}
-		};
+		update({ dialogStack: [...stack, id] });
+
+		return () => update({ dialogStack: stack.filter((item) => item !== id) });
 	}, [isOpen, id, update]);
 
 	useEffect(() => {
@@ -44,17 +36,15 @@ export const useDialog = ({ isOpen, onClose }: UseDialogStackProps) => {
 		};
 	}, [isOpen, onClose, stack, id]);
 
-	useEffect(() => {
-		if (isOpen) {
-			document.body.style.overflow = 'hidden';
-		} else {
-			document.body.style.overflow = 'auto';
-		}
+	useLayoutEffect(() => {
+		if (!isOpen) return;
+
+		const previousOverflow = document.body.style.overflow;
+
+		document.body.style.overflow = 'hidden';
 
 		return () => {
-			document.body.style.overflow = 'auto';
+			document.body.style.overflow = previousOverflow;
 		};
 	}, [isOpen]);
-
-	return { transitionRef };
 };
