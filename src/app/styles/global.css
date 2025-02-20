@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
+@import url('./design-system/colors.css');
+@import url('./design-system/spacing.css');
+@import url('./design-system/radius.css');
+@import url('./design-system/transition.css');
+@import url('./reset.css');
+
+
 html, body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -12,13 +19,3 @@ html, body {
     box-sizing: inherit;
 }
 
-* {
-	border: 0;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-}
-
-:root {
-	--system-color-dark-500: black;
-}

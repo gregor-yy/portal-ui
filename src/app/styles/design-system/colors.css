@@ -1,0 +1,7 @@
+:root {
+    /* Light */
+	--system-color-light-500: white;
+    /* Dark */
+	--system-color-dark-500: black;
+	--system-color-dark-500-opaque-500: #00000050;
+}

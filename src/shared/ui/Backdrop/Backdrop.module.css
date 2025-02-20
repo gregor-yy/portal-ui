@@ -1,0 +1,6 @@
+.container {
+    position: absolute;
+    inset: 0;
+    background-color: var(--system-color-dark-500-opaque-500);
+    z-index: -1;
+}

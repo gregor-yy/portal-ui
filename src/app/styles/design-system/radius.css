@@ -1,0 +1,9 @@
+:root {
+	--system-radius-100: 4px;
+	--system-radius-200: 8px;
+	--system-radius-300: 12px;
+	--system-radius-400: 16px;
+	--system-radius-500: 24px;
+	--system-radius-600: 32px;
+	--system-radius-max: 1000px;
+}
