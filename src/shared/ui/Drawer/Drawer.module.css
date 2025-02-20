@@ -1,0 +1,79 @@
+.container {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--system-transition-100);
+}
+
+.body {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background-color: var(--system-color-light-500);
+    padding: var(--system-spacing-400);
+}
+
+/* Transition animations */
+
+.container.enter {
+    pointer-events: inherit;
+    opacity: 1;
+}
+
+
+.body {
+    position: absolute;
+    background-color: var(--system-color-light-500);
+    padding: var(--system-spacing-400);
+    transition: transform var(--system-transition-100);
+}
+
+.body.left {
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: 0;
+    transform: translateX(-100%);
+}
+
+.body.left.enter {
+    transform: translateX(0%);
+}
+
+.body.right {
+    top: 0;
+    left: auto;
+    right: 0;
+    bottom: 0;
+    transform: translateX(100%);
+}
+
+.body.right.enter {
+    transform: translateX(0%);
+}
+
+.body.top {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    transform: translateY(-100%);
+}
+
+.body.top.enter {
+    transform: translateY(0%);
+}
+
+.body.bottom {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: translateY(100%);
+}
+
+.body.bottom.enter {
+    transform: translateY(0%);
+}

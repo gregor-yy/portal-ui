@@ -1,5 +1,9 @@
 .container {
-    padding: var(--system-spacing-500);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .button {

@@ -8,22 +8,25 @@ import { Backdrop } from '../Backdrop';
 import { FocusTrap } from '../FocusTrap';
 import { Portal } from '../Portal';
 
-import styles from './Modal.module.css';
+import styles from './Drawer.module.css';
 
-type TModalClasses = {
+type TDrawerClasses = {
 	body?: string;
 	backdrop?: string;
 };
 
-interface ModalProps {
+type TDrawerAnchor = 'left' | 'right' | 'top' | 'bottom';
+
+interface DrawerProps {
 	isOpen: boolean;
 	onClose?: () => void;
 	children: ReactNode;
-	classes?: TModalClasses;
+	anchor?: TDrawerAnchor;
+	classes?: TDrawerClasses;
 }
 
-export const Modal: FC<ModalProps> = ({ isOpen, onClose, children, classes }) => {
-	const transitionRef = useRef<HTMLDivElement | null>(null);
+export const Drawer: FC<DrawerProps> = ({ isOpen, onClose, children, classes, anchor = 'left' }) => {
+	const transitionRef = useRef(null);
 
 	useDialog({ isOpen, onClose });
 
@@ -40,7 +43,9 @@ export const Modal: FC<ModalProps> = ({ isOpen, onClose, children, classes }) =>
 						<Backdrop className={classes?.backdrop} onClick={onClose} />
 						<FocusTrap>
 							<div
-								className={classNames(styles.body, classes?.body)}
+								className={classNames(styles.body, classes?.body, styles[anchor], {
+									[styles.enter]: status === 'entering' || status === 'entered',
+								})}
 								onClick={(event) => event.stopPropagation()}
 							>
 								{children}
