@@ -1,6 +1,7 @@
 import { FC, ReactNode, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
+import { ETransition } from '@/shared/constants';
 import { useDialog } from '@/shared/hooks';
 import { classNames } from '@/shared/lib';
 
@@ -15,20 +16,20 @@ type TModalClasses = {
 	backdrop?: string;
 };
 
-interface ModalProps {
+interface IModalProps {
 	isOpen: boolean;
 	onClose?: () => void;
 	children: ReactNode;
 	classes?: TModalClasses;
 }
 
-export const Modal: FC<ModalProps> = ({ isOpen, onClose, children, classes }) => {
+export const Modal: FC<IModalProps> = ({ isOpen, onClose, children, classes }) => {
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 
 	useDialog({ isOpen, onClose });
 
 	return (
-		<Transition nodeRef={transitionRef} in={isOpen} timeout={500} mountOnEnter unmountOnExit>
+		<Transition timeout={ETransition.TRANSITION_100} nodeRef={transitionRef} in={isOpen} mountOnEnter unmountOnExit>
 			{(status) => (
 				<Portal>
 					<div

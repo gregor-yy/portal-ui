@@ -4,11 +4,11 @@ import { classNames } from '@/shared/lib';
 
 import styles from './Backdrop.module.css';
 
-interface BackdropProps {
+interface IBackdropProps {
 	className?: string;
 	onClick?: () => void;
 }
 
-export const Backdrop: FC<BackdropProps> = ({ className, onClick }) => {
+export const Backdrop: FC<IBackdropProps> = ({ className, onClick }) => {
 	return <div className={classNames(styles.container, className)} onClick={onClick} />;
 };

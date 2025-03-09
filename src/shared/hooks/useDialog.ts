@@ -2,12 +2,12 @@ import { useEffect, useId, useLayoutEffect } from 'react';
 
 import { useSelector, useUpdate } from '../store';
 
-interface UseDialogStackProps {
+interface IUseDialogStackProps {
 	isOpen: boolean;
 	onClose?: () => void;
 }
 
-export const useDialog = ({ isOpen, onClose }: UseDialogStackProps) => {
+export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
 	const id = useId();
 	const stack = useSelector((store) => store.dialogStack);
 	const update = useUpdate();

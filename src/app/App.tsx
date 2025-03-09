@@ -1,99 +1,96 @@
-import { useState } from 'react';
+import { Fragment, MouseEvent, useId, useState } from 'react';
 
-import { Drawer, Modal } from '@/shared/ui';
+import { Drawer, Modal, Popover, Tooltip } from '@/shared/ui';
 
 import styles from './App.module.css';
 
 export const App = () => {
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	return (
 		<div className={styles.container}>
+			<ModalDemo />
+			<DrawerDemo />
+			<TooltipDemo />
+			<PopoverDemo />
+		</div>
+	);
+};
+
+const ModalDemo = () => {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	return (
+		<Fragment>
 			<button className={styles.button} onClick={() => setIsModalOpen(true)}>
 				Open Modal
 			</button>
+			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+				<p style={{ maxWidth: '300px' }}>
+					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut, aperiam reprehenderit, libero aliquid
+					inventore similique provident quasi velit sit omnis cupiditate debitis quo nihil! Tenetur nemo autem
+					hic dicta id.
+				</p>
+			</Modal>
+		</Fragment>
+	);
+};
+
+const DrawerDemo = () => {
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	return (
+		<Fragment>
 			<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
 				Open Drawer
 			</button>
-			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-				Modal
-				<SubModal />
-			</Modal>
 			<Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
-				Drawer
-				<TopDrawer />
+				<p style={{ maxWidth: '300px' }}>
+					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut, aperiam reprehenderit, libero aliquid
+					inventore similique provident quasi velit sit omnis cupiditate debitis quo nihil! Tenetur nemo autem
+					hic dicta id.
+				</p>
 			</Drawer>
-		</div>
+		</Fragment>
 	);
 };
 
-const SubModal = () => {
-	const [isModalOpen, setIsModalOpen] = useState(false);
+const TooltipDemo = () => {
 	return (
-		<div>
-			<button className={styles.button} onClick={() => setIsModalOpen(true)}>
-				open sub model
-			</button>
-			<button className={styles.button} onClick={() => setIsModalOpen(true)}>
-				open sub model
-			</button>
-			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-				Sub modal
-				<TopDrawer />
-			</Modal>
-		</div>
+		<Tooltip content="I am Tooltip!!!" isArrowShow>
+			<button className={styles.button}>Open Tooltip</button>
+		</Tooltip>
 	);
 };
 
-const TopDrawer = () => {
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	return (
-		<div>
-			<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
-				open Top Drawer
-			</button>
-			<Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} anchor="top">
-				Top Drawer
-				<RightDrawer />
-			</Drawer>
-		</div>
-	);
-};
+const PopoverDemo = () => {
+	const buttonAriaDescribedbyId = useId();
 
-const RightDrawer = () => {
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-	return (
-		<div>
-			<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
-				open Right Drawer
-			</button>
-			<Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} anchor="right">
-				Right Drawer
-				<BottomDrawer />
-			</Drawer>
-		</div>
-	);
-};
+	const [popoverAnchorEl, setPopoverAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-const BottomDrawer = () => {
-	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+	const handleOpen = (event: MouseEvent<HTMLButtonElement>) => {
+		setPopoverAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setPopoverAnchorEl(null);
+	};
+
+	const isPopoverOpen = Boolean(popoverAnchorEl);
+
 	return (
-		<div>
-			<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
-				open Bottom Drawer
+		<Fragment>
+			<button id={buttonAriaDescribedbyId} className={styles.button} onClick={handleOpen}>
+				Open Popover
 			</button>
-			<Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} anchor="bottom">
-				Bottom Drawer
-				<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
-					open Bottom Drawer
-				</button>
-				<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
-					open Bottom Drawer
-				</button>
-				<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
-					open Bottom Drawer
-				</button>
-			</Drawer>
-		</div>
+			<Popover
+				id={buttonAriaDescribedbyId}
+				isOpen={isPopoverOpen}
+				anchorEl={popoverAnchorEl}
+				onClose={handleClose}
+			>
+				<p style={{ maxWidth: '300px' }}>
+					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut, aperiam reprehenderit, libero aliquid
+					inventore similique provident quasi velit sit omnis cupiditate debitis quo nihil! Tenetur nemo autem
+					hic dicta id.
+				</p>
+			</Popover>
+		</Fragment>
 	);
 };

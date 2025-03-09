@@ -1,10 +1,10 @@
 import { FC, ReactNode, useEffect, useRef } from 'react';
 
-interface FocusTrapProps {
+interface IFocusTrapProps {
 	children: ReactNode;
 }
 
-export const FocusTrap: FC<FocusTrapProps> = ({ children }) => {
+export const FocusTrap: FC<IFocusTrapProps> = ({ children }) => {
 	const trapRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {

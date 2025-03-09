@@ -1,7 +1,7 @@
 import { createOptimizedContext } from "@/shared/lib";
 
-interface AppContextData {
+interface IAppContextData {
   dialogStack: string[];
 }
 
-export const { Provider: AppProvider, useSelector, useUpdate } = createOptimizedContext<AppContextData>();
+export const { Provider: AppProvider, useSelector, useUpdate } = createOptimizedContext<IAppContextData>();

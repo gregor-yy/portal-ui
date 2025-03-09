@@ -4,8 +4,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: var(--system-spacing-400);
+    /* for scroll */
+    margin-bottom: 100vw;
 }
 
 .button {
+    cursor: pointer;
     padding: var(--system-spacing-400);
+    border-radius: var(--system-radius-100);
+    background-color: var(--system-color-action-500);
+    color: var(--system-color-light-500);
+    font-size: 20px;
 }
