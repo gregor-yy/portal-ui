@@ -8,6 +8,7 @@ import { TPopoverPlacement } from '@/shared/types';
 
 import { Backdrop } from '../Backdrop';
 import { FocusTrap } from '../FocusTrap';
+import { Overlay } from '../Overlay';
 import { Portal } from '../Portal';
 
 import styles from './Popover.module.css';
@@ -51,20 +52,14 @@ export const Popover: FC<IPopoverProps> = ({
 					>
 						<Backdrop className={styles.backdrop} onClick={onClose} />
 						<FocusTrap>
-							<div
+							<Overlay
 								id={id}
 								ref={overlayRef}
-								className={classNames(
-									styles.body,
-									styles[placement],
-									{
-										[styles.enter]: status === 'entering' || status === 'entered',
-									},
-									className,
-								)}
+								isOpen={status === 'entering' || status === 'entered'}
+								className={classNames(styles.body, className)}
 							>
 								{children}
-							</div>
+							</Overlay>
 						</FocusTrap>
 					</div>
 				</Portal>

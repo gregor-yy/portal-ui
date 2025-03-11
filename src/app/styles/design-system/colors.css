@@ -6,6 +6,7 @@
 	/* Gray */
 	--system-color-gray-500: #bdc3c7;
     /* Dark */
-	--system-color-dark-500: black;
+	--system-color-dark-400: #3f5c79;
+	--system-color-dark-500: #2c3e50;
 	--system-color-dark-500-opaque-500: #00000050;
 }

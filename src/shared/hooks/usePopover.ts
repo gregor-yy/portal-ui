@@ -4,7 +4,7 @@ import { TPopoverPlacement } from '../types';
 
 interface IUsePopoverProps {
 	isOpen: boolean;
-	anchorEl: HTMLElement | null;
+	anchorEl?: HTMLElement | null;
 	anchorPlacement: TPopoverPlacement;
 	placement: TPopoverPlacement;
 }

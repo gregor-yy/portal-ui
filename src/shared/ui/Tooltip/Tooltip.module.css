@@ -3,14 +3,7 @@
 }
 
 .body {
-    pointer-events: none;
-    position: absolute;
-    padding: 4px 24px;
-    background-color: var(--system-color-gray-500);
-    transform: scale(0.9);
-    opacity: 0;
-    transition: opacity var(--system-transition-100), transform var(--system-transition-100);
-    border-radius: var(--system-radius-100);
+    padding: var(--system-spacing-200) var(--system-spacing-700);
 }
 
 .bodyWithArrow.top::before {
@@ -26,11 +19,5 @@
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border-color: var(--system-color-gray-500) transparent transparent transparent; 
-}
-
-.body.enter {
-    pointer-events: inherit;
-    opacity: 1;
-    transform: scale(1);
+    border-color: var(--system-color-dark-500) transparent transparent transparent; 
 }

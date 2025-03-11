@@ -1,0 +1,28 @@
+.container {
+    pointer-events: none;
+}
+
+.container.enter {
+    pointer-events: inherit;
+}
+
+.body {
+    padding: var(--system-spacing-200) 0px;
+}
+
+.body ul {
+    list-style: none;
+}
+
+.item {
+    cursor: pointer;
+    padding: var(--system-spacing-300) var(--system-spacing-400);
+}
+
+.item:hover {
+    background-color: var(--system-color-dark-400)
+}
+
+.backdrop {
+    background-color: transparent;
+}

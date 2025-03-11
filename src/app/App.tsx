@@ -1,6 +1,6 @@
 import { Fragment, MouseEvent, useId, useState } from 'react';
 
-import { Drawer, Modal, Popover, Tooltip } from '@/shared/ui';
+import { Drawer, Dropdown, Modal, Popover, Tooltip } from '@/shared/ui';
 
 import styles from './App.module.css';
 
@@ -11,6 +11,7 @@ export const App = () => {
 			<DrawerDemo />
 			<TooltipDemo />
 			<PopoverDemo />
+			<DropdownDemo />
 		</div>
 	);
 };
@@ -92,5 +93,20 @@ const PopoverDemo = () => {
 				</p>
 			</Popover>
 		</Fragment>
+	);
+};
+
+const DropdownDemo = () => {
+	return (
+		<Dropdown>
+			<Dropdown.Trigger>
+				<button className={styles.button}>Open Dropdown</button>
+			</Dropdown.Trigger>
+			<Dropdown.Menu>
+				<Dropdown.Item>Profile</Dropdown.Item>
+				<Dropdown.Item>My account</Dropdown.Item>
+				<Dropdown.Item>Logout</Dropdown.Item>
+			</Dropdown.Menu>
+		</Dropdown>
 	);
 };

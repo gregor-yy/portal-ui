@@ -6,6 +6,7 @@ import { useTooltip } from '@/shared/hooks';
 import { classNames } from '@/shared/lib';
 import { TTooltipPlacement } from '@/shared/types';
 
+import { Overlay } from '../Overlay';
 import { Portal } from '../Portal';
 
 import styles from './Tooltip.module.css';
@@ -44,20 +45,20 @@ export const Tooltip: FC<ITooltipProps> = ({
 			>
 				{(status) => (
 					<Portal>
-						<div
+						<Overlay
 							ref={overlayRef}
+							isOpen={status === 'entering' || status === 'entered'}
 							className={classNames(
 								styles.body,
 								styles[placement],
 								{
-									[styles.enter]: status === 'entering' || status === 'entered',
 									[styles.bodyWithArrow]: isArrowShow,
 								},
 								className,
 							)}
 						>
 							{content}
-						</div>
+						</Overlay>
 					</Portal>
 				)}
 			</Transition>
