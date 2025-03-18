@@ -7,8 +7,8 @@ import { classNames } from '@/shared/lib';
 import { TPopoverPlacement } from '@/shared/types';
 
 import { Backdrop } from '../Backdrop';
+import { FloatingContainer } from '../FloatingContainer';
 import { FocusTrap } from '../FocusTrap';
-import { Overlay } from '../Overlay';
 import { Portal } from '../Portal';
 
 import styles from './Popover.module.css';
@@ -36,7 +36,7 @@ export const Popover: FC<IPopoverProps> = ({
 }) => {
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 
-	const { overlayRef } = usePopover({ isOpen, anchorEl, anchorPlacement, placement });
+	const { floatingContainerRef } = usePopover({ isOpen, anchorEl, anchorPlacement, placement });
 
 	useDialog({ isOpen, onClose });
 
@@ -52,14 +52,14 @@ export const Popover: FC<IPopoverProps> = ({
 					>
 						<Backdrop className={styles.backdrop} onClick={onClose} />
 						<FocusTrap>
-							<Overlay
+							<FloatingContainer
 								id={id}
-								ref={overlayRef}
+								ref={floatingContainerRef}
 								isOpen={status === 'entering' || status === 'entered'}
 								className={classNames(styles.body, className)}
 							>
 								{children}
-							</Overlay>
+							</FloatingContainer>
 						</FocusTrap>
 					</div>
 				</Portal>

@@ -18,8 +18,8 @@ import { classNames } from '@/shared/lib';
 import { TPopoverPlacement } from '@/shared/types';
 
 import { Backdrop } from '../Backdrop';
+import { FloatingContainer } from '../FloatingContainer';
 import { FocusTrap } from '../FocusTrap';
-import { Overlay } from '../Overlay';
 import { Portal } from '../Portal';
 
 import styles from './Dropdown.module.css';
@@ -93,7 +93,7 @@ export const Menu: FC<IMenuProps> = ({
 }) => {
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 
-	const { overlayRef } = usePopover({ isOpen, anchorEl, anchorPlacement, placement });
+	const { floatingContainerRef } = usePopover({ isOpen, anchorEl, anchorPlacement, placement });
 
 	useDialog({ isOpen, onClose });
 
@@ -109,8 +109,8 @@ export const Menu: FC<IMenuProps> = ({
 					>
 						<Backdrop className={styles.backdrop} onClick={onClose} />
 						<FocusTrap>
-							<Overlay
-								ref={overlayRef}
+							<FloatingContainer
+								ref={floatingContainerRef}
 								isOpen={status === 'entering' || status === 'entered'}
 								className={classNames(styles.body, className)}
 							>
@@ -122,7 +122,7 @@ export const Menu: FC<IMenuProps> = ({
 										return child;
 									})}
 								</ul>
-							</Overlay>
+							</FloatingContainer>
 						</FocusTrap>
 					</div>
 				</Portal>

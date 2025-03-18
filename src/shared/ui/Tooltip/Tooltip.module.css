@@ -1,12 +1,8 @@
-.container {
-    position: relative;
-}
-
 .body {
     padding: var(--system-spacing-200) var(--system-spacing-700);
 }
 
-.bodyWithArrow.top::before {
+.bodyWithArrow::before {
     content: '';
     position: absolute;
     width: 10px;
@@ -15,9 +11,82 @@
     border-style: solid;
 }
 
+/* TOP */
 .bodyWithArrow.top::before {
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    border-color: var(--system-color-dark-500) transparent transparent transparent; 
+    border-color: var(--system-color-dark-500) transparent transparent transparent;
+}
+
+.bodyWithArrow.top-start::before {
+    top: 100%;
+    right: 10%;
+    border-color: var(--system-color-dark-500) transparent transparent transparent;
+}
+
+.bodyWithArrow.top-end::before {
+    top: 100%;
+    left: 10%;
+    border-color: var(--system-color-dark-500) transparent transparent transparent;
+}
+
+/* RIGHT */
+.bodyWithArrow.right::before {
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    border-color: transparent var(--system-color-dark-500) transparent transparent;
+}
+
+.bodyWithArrow.right-start::before {
+    bottom: 10%;
+    right: 100%;
+    border-color: transparent var(--system-color-dark-500) transparent transparent;
+}
+
+.bodyWithArrow.right-end::before {
+    top: 10%;
+    right: 100%;
+    border-color: transparent var(--system-color-dark-500) transparent transparent;
+}
+
+/* BOTTOM */
+.bodyWithArrow.bottom::before {
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-color: transparent transparent var(--system-color-dark-500) transparent;
+}
+
+.bodyWithArrow.bottom-start::before {
+    bottom: 100%;
+    right: 10%;
+    border-color: transparent transparent var(--system-color-dark-500) transparent;
+}
+
+.bodyWithArrow.bottom-end::before {
+    bottom: 100%;
+    left: 10%;
+    border-color: transparent transparent var(--system-color-dark-500) transparent;
+}
+
+/* LEFT */
+.bodyWithArrow.left::before {
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%);
+    border-color: transparent transparent transparent var(--system-color-dark-500);
+}
+
+.bodyWithArrow.left-start::before {
+    bottom: 10%;
+    left: 100%;
+    border-color: transparent transparent transparent var(--system-color-dark-500);
+}
+
+.bodyWithArrow.left-end::before {
+    top: 10%;
+    left: 100%;
+    border-color: transparent transparent transparent var(--system-color-dark-500);
 }

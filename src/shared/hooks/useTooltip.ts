@@ -10,7 +10,7 @@ interface IUseTooltipProps {
 
 export const useTooltip = ({ placement, offset = DEFAULT_TOOLTIP_OFFSET_PX }: IUseTooltipProps) => {
 	const anchorRef = useRef<HTMLDivElement | null>(null);
-	const overlayRef = useRef<HTMLDivElement | null>(null);
+	const floatingContainerRef = useRef<HTMLDivElement | null>(null);
 
 	const [isOpen, setIsOpen] = useState(false);
 
@@ -21,77 +21,77 @@ export const useTooltip = ({ placement, offset = DEFAULT_TOOLTIP_OFFSET_PX }: IU
 		if (!isOpen) return;
 
 		const anchor = anchorRef.current;
-		const overlay = overlayRef.current;
+		const floatingContainer = floatingContainerRef.current;
 
-		if (!(anchor && overlay)) return;
+		if (!(anchor && floatingContainer)) return;
 
 		const containerTop = anchor.offsetTop;
 		const containerLeft = anchor.offsetLeft;
 		const containerWidth = anchor.offsetWidth;
 		const containerHeight = anchor.offsetHeight;
 
-		const overlayWidth = overlay.offsetWidth;
-		const overlayHeight = overlay.offsetHeight;
+		const floatingContainerWidth = floatingContainer.offsetWidth;
+		const floatingContainerHeight = floatingContainer.offsetHeight;
 
-		let overlayTop = 0;
-		let overlayLeft = 0;
+		let floatingContainerTop = 0;
+		let floatingContainerLeft = 0;
 
 		switch (placement) {
 			case 'top-start':
-				overlayTop = containerTop - overlayHeight - offset;
-				overlayLeft = containerLeft;
+				floatingContainerTop = containerTop - floatingContainerHeight - offset;
+				floatingContainerLeft = containerLeft;
 				break;
 			case 'top':
-				overlayTop = containerTop - overlayHeight - offset;
-				overlayLeft = containerLeft + containerWidth / 2 - overlayWidth / 2;
+				floatingContainerTop = containerTop - floatingContainerHeight - offset;
+				floatingContainerLeft = containerLeft + containerWidth / 2 - floatingContainerWidth / 2;
 				break;
 			case 'top-end':
-				overlayTop = containerTop - overlayHeight - offset;
-				overlayLeft = containerLeft + containerWidth - overlayWidth;
+				floatingContainerTop = containerTop - floatingContainerHeight - offset;
+				floatingContainerLeft = containerLeft + containerWidth - floatingContainerWidth;
 				break;
 			case 'right-start':
-				overlayTop = containerTop;
-				overlayLeft = containerLeft + containerWidth + offset;
+				floatingContainerTop = containerTop;
+				floatingContainerLeft = containerLeft + containerWidth + offset;
 				break;
 			case 'right':
-				overlayTop = containerTop + containerHeight / 2 - overlayHeight / 2;
-				overlayLeft = containerLeft + containerWidth + offset;
+				floatingContainerTop = containerTop + containerHeight / 2 - floatingContainerHeight / 2;
+				floatingContainerLeft = containerLeft + containerWidth + offset;
 				break;
 			case 'right-end':
-				overlayTop = containerTop + containerHeight - overlayHeight;
-				overlayLeft = containerLeft + containerWidth + offset;
+				floatingContainerTop = containerTop + containerHeight - floatingContainerHeight;
+				floatingContainerLeft = containerLeft + containerWidth + offset;
 				break;
 			case 'bottom-start':
-				overlayTop = containerTop + containerHeight + offset;
-				overlayLeft = containerLeft;
+				floatingContainerTop = containerTop + containerHeight + offset;
+				floatingContainerLeft = containerLeft;
 				break;
 			case 'bottom':
-				overlayTop = containerTop + containerHeight + offset;
-				overlayLeft = containerLeft + containerWidth / 2 - overlayWidth / 2;
+				floatingContainerTop = containerTop + containerHeight + offset;
+				floatingContainerLeft = containerLeft + containerWidth / 2 - floatingContainerWidth / 2;
 				break;
 			case 'bottom-end':
-				overlayTop = containerTop + containerHeight + offset;
-				overlayLeft = containerLeft + containerWidth - overlayWidth;
+				floatingContainerTop = containerTop + containerHeight + offset;
+				floatingContainerLeft = containerLeft + containerWidth - floatingContainerWidth;
 				break;
 			case 'left-start':
-				overlayTop = containerTop;
-				overlayLeft = containerLeft - overlayWidth - offset;
+				floatingContainerTop = containerTop;
+				floatingContainerLeft = containerLeft - floatingContainerWidth - offset;
 				break;
 			case 'left':
-				overlayTop = containerTop + containerHeight / 2 - overlayHeight / 2;
-				overlayLeft = containerLeft - overlayWidth - offset;
+				floatingContainerTop = containerTop + containerHeight / 2 - floatingContainerHeight / 2;
+				floatingContainerLeft = containerLeft - floatingContainerWidth - offset;
 				break;
 			case 'left-end':
-				overlayTop = containerTop + containerHeight - overlayHeight;
-				overlayLeft = containerLeft - overlayWidth - offset;
+				floatingContainerTop = containerTop + containerHeight - floatingContainerHeight;
+				floatingContainerLeft = containerLeft - floatingContainerWidth - offset;
 				break;
 			default:
 				break;
 		}
 
-		overlay.style.top = `${overlayTop}px`;
-		overlay.style.left = `${overlayLeft}px`;
+		floatingContainer.style.top = `${floatingContainerTop}px`;
+		floatingContainer.style.left = `${floatingContainerLeft}px`;
 	}, [isOpen, placement, offset]);
 
-	return { anchorRef, overlayRef, isOpen, handleOpen, handleClose };
+	return { anchorRef, floatingContainerRef, isOpen, handleOpen, handleClose };
 };

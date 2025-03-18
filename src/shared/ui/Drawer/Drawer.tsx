@@ -46,7 +46,6 @@ export const Drawer: FC<DrawerProps> = ({ isOpen, onClose, children, classes, an
 								className={classNames(styles.body, classes?.body, styles[anchor], {
 									[styles.enter]: status === 'entering' || status === 'entered',
 								})}
-								onClick={(event) => event.stopPropagation()}
 							>
 								{children}
 							</div>

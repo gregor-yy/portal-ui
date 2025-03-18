@@ -10,15 +10,15 @@ interface IUsePopoverProps {
 }
 
 export const usePopover = ({ isOpen, anchorEl, anchorPlacement, placement }: IUsePopoverProps) => {
-	const overlayRef = useRef<HTMLDivElement | null>(null);
+	const floatingContainerRef = useRef<HTMLDivElement | null>(null);
 
 	useLayoutEffect(() => {
 		if (!isOpen) return;
 
 		const anchor = anchorEl;
-		const overlay = overlayRef.current;
+		const floatingContainer = floatingContainerRef.current;
 
-		if (!(anchor && overlay)) return;
+		if (!(anchor && floatingContainer)) return;
 
 		let anchorHorizontalPosition = 0;
 		let anchorVerticalPosition = 0;
@@ -58,23 +58,23 @@ export const usePopover = ({ isOpen, anchorEl, anchorPlacement, placement }: IUs
 				break;
 		}
 
-		const overlayWidth = overlay.offsetWidth;
-		const overlayHeight = overlay.offsetHeight;
+		const floatingContainerWidth = floatingContainer.offsetWidth;
+		const floatingContainerHeight = floatingContainer.offsetHeight;
 
-		let overlayTop = 0;
-		let overlayLeft = 0;
+		let floatingContainerTop = 0;
+		let floatingContainerLeft = 0;
 
 		const [verticalPlacement, horizontalPlacement] = placement.split('-');
 
 		switch (verticalPlacement) {
 			case 'top':
-				overlayTop = anchorVerticalPosition - overlayHeight;
+				floatingContainerTop = anchorVerticalPosition - floatingContainerHeight;
 				break;
 			case 'center':
-				overlayTop = anchorVerticalPosition - overlayHeight / 2;
+				floatingContainerTop = anchorVerticalPosition - floatingContainerHeight / 2;
 				break;
 			case 'bottom':
-				overlayTop = anchorVerticalPosition;
+				floatingContainerTop = anchorVerticalPosition;
 				break;
 			default:
 				break;
@@ -82,21 +82,21 @@ export const usePopover = ({ isOpen, anchorEl, anchorPlacement, placement }: IUs
 
 		switch (horizontalPlacement) {
 			case 'left':
-				overlayLeft = anchorHorizontalPosition - overlayWidth;
+				floatingContainerLeft = anchorHorizontalPosition - floatingContainerWidth;
 				break;
 			case 'center':
-				overlayLeft = anchorHorizontalPosition - overlayWidth / 2;
+				floatingContainerLeft = anchorHorizontalPosition - floatingContainerWidth / 2;
 				break;
 			case 'right':
-				overlayLeft = anchorHorizontalPosition;
+				floatingContainerLeft = anchorHorizontalPosition;
 				break;
 			default:
 				break;
 		}
 
-		overlay.style.top = `${overlayTop}px`;
-		overlay.style.left = `${overlayLeft}px`;
+		floatingContainer.style.top = `${floatingContainerTop}px`;
+		floatingContainer.style.left = `${floatingContainerLeft}px`;
 	}, [isOpen, anchorPlacement, placement, anchorEl]);
 
-	return { overlayRef };
+	return { floatingContainerRef };
 };

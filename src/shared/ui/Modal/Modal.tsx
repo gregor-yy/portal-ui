@@ -57,12 +57,7 @@ export const Modal: FC<IModalProps> = ({ isOpen, onClose, children, classes }) =
 					>
 						<Backdrop className={classes?.backdrop} onClick={onClose} />
 						<FocusTrap>
-							<div
-								className={classNames(styles.body, classes?.body)}
-								onClick={(event) => event.stopPropagation()}
-							>
-								{children}
-							</div>
+							<div className={classNames(styles.body, classes?.body)}>{children}</div>
 						</FocusTrap>
 					</div>
 				</Portal>

@@ -2,15 +2,15 @@ import { FC, HTMLAttributes, ReactNode, RefObject } from 'react';
 
 import { classNames } from '@/shared/lib';
 
-import styles from './Overlay.module.css';
+import styles from './FloatingContainer.module.css';
 
-interface IOverlayProps extends HTMLAttributes<HTMLDivElement> {
+interface IFloatingContainerProps extends HTMLAttributes<HTMLDivElement> {
 	ref: RefObject<HTMLDivElement | null>;
 	isOpen: boolean;
 	children: ReactNode;
 }
 
-export const Overlay: FC<IOverlayProps> = ({ isOpen, children, className, ...props }) => {
+export const FloatingContainer: FC<IFloatingContainerProps> = ({ isOpen, children, className, ...props }) => {
 	return (
 		<div
 			{...props}

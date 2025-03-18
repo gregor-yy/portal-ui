@@ -32,17 +32,18 @@ export const FocusTrap: FC<IFocusTrapProps> = ({ children }) => {
 		};
 
 		const trapElement = trapRef.current;
-		trapElement?.addEventListener('keydown', handleTabKey);
+		if (!trapElement) return;
 
-		const firstFocusableElement = trapElement?.querySelector<HTMLElement>(
+		trapElement.addEventListener('keydown', handleTabKey);
+
+		const firstFocusableElement = trapElement.querySelector<HTMLElement>(
 			'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
 		);
-		if (firstFocusableElement) {
-			firstFocusableElement.focus();
-		}
+
+		if (firstFocusableElement) firstFocusableElement.focus();
 
 		return () => {
-			trapElement?.removeEventListener('keydown', handleTabKey);
+			trapElement.removeEventListener('keydown', handleTabKey);
 		};
 	}, []);
 

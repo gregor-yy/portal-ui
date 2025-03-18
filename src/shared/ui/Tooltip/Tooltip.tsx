@@ -6,7 +6,7 @@ import { useTooltip } from '@/shared/hooks';
 import { classNames } from '@/shared/lib';
 import { TTooltipPlacement } from '@/shared/types';
 
-import { Overlay } from '../Overlay';
+import { FloatingContainer } from '../FloatingContainer';
 import { Portal } from '../Portal';
 
 import styles from './Tooltip.module.css';
@@ -28,7 +28,7 @@ export const Tooltip: FC<ITooltipProps> = ({
 	className,
 	offset,
 }) => {
-	const { isOpen, anchorRef, overlayRef, handleOpen, handleClose } = useTooltip({
+	const { isOpen, anchorRef, floatingContainerRef, handleOpen, handleClose } = useTooltip({
 		placement,
 		offset,
 	});
@@ -37,7 +37,7 @@ export const Tooltip: FC<ITooltipProps> = ({
 		<div ref={anchorRef} onMouseEnter={handleOpen} onMouseLeave={handleClose} onFocus={handleOpen}>
 			{children}
 			<Transition
-				nodeRef={overlayRef}
+				nodeRef={floatingContainerRef}
 				in={isOpen}
 				timeout={ETransition.TRANSITION_100}
 				mountOnEnter
@@ -45,8 +45,8 @@ export const Tooltip: FC<ITooltipProps> = ({
 			>
 				{(status) => (
 					<Portal>
-						<Overlay
-							ref={overlayRef}
+						<FloatingContainer
+							ref={floatingContainerRef}
 							isOpen={status === 'entering' || status === 'entered'}
 							className={classNames(
 								styles.body,
@@ -58,7 +58,7 @@ export const Tooltip: FC<ITooltipProps> = ({
 							)}
 						>
 							{content}
-						</Overlay>
+						</FloatingContainer>
 					</Portal>
 				)}
 			</Transition>
