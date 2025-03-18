@@ -1,7 +1,7 @@
 import { FC, ReactNode } from 'react';
 import { Transition } from 'react-transition-group';
 
-import { ETransition } from '@/shared/constants';
+import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useTooltip } from '@/shared/hooks';
 import { classNames } from '@/shared/lib';
 import { TTooltipPlacement } from '@/shared/types';
@@ -39,7 +39,7 @@ export const Tooltip: FC<ITooltipProps> = ({
 			<Transition
 				nodeRef={floatingContainerRef}
 				in={isOpen}
-				timeout={ETransition.TRANSITION_100}
+				timeout={SYSTEM_TRANSITION_MS_100}
 				mountOnEnter
 				unmountOnExit
 			>

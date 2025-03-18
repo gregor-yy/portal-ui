@@ -12,7 +12,7 @@ import {
 } from 'react';
 import { Transition } from 'react-transition-group';
 
-import { ETransition } from '@/shared/constants';
+import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useDialog, usePopover } from '@/shared/hooks';
 import { classNames } from '@/shared/lib';
 import { TPopoverPlacement } from '@/shared/types';
@@ -98,7 +98,7 @@ export const Menu: FC<IMenuProps> = ({
 	useDialog({ isOpen, onClose });
 
 	return (
-		<Transition nodeRef={transitionRef} in={isOpen} timeout={ETransition.TRANSITION_100} mountOnEnter unmountOnExit>
+		<Transition nodeRef={transitionRef} in={isOpen} timeout={SYSTEM_TRANSITION_MS_100} mountOnEnter unmountOnExit>
 			{(status) => (
 				<Portal>
 					<div

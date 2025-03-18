@@ -1,7 +1,7 @@
 import { FC, ReactNode, useLayoutEffect, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
-import { ETransition } from '@/shared/constants';
+import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useDialog } from '@/shared/hooks';
 import { classNames, getScrollbarWidth } from '@/shared/lib';
 
@@ -46,7 +46,7 @@ export const Modal: FC<IModalProps> = ({ isOpen, onClose, children, classes }) =
 	}, [isOpen]);
 
 	return (
-		<Transition timeout={ETransition.TRANSITION_100} nodeRef={containerRef} in={isOpen} mountOnEnter unmountOnExit>
+		<Transition timeout={SYSTEM_TRANSITION_MS_100} nodeRef={containerRef} in={isOpen} mountOnEnter unmountOnExit>
 			{(status) => (
 				<Portal>
 					<div
