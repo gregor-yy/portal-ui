@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+import { FC, FocusEventHandler, MouseEventHandler, ReactElement, ReactNode } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
@@ -11,8 +11,14 @@ import { Portal } from '../Portal';
 
 import styles from './Tooltip.module.css';
 
+type TTooltipChildrenProps = {
+	onMouseEnter: MouseEventHandler<HTMLElement>;
+	onMouseLeave: MouseEventHandler<HTMLElement>;
+	onFocus: FocusEventHandler<HTMLElement>;
+};
+
 interface ITooltipProps {
-	children: ReactNode;
+	children: (props: TTooltipChildrenProps) => ReactElement;
 	content: string | ReactNode;
 	placement?: TTooltipPlacement;
 	isArrowShow?: boolean;
@@ -28,14 +34,14 @@ export const Tooltip: FC<ITooltipProps> = ({
 	className,
 	offset,
 }) => {
-	const { isOpen, anchorRef, floatingContainerRef, handleOpen, handleClose } = useTooltip({
+	const { isOpen, floatingContainerRef, handleOpen, handleClose } = useTooltip({
 		placement,
 		offset,
 	});
 
 	return (
-		<div ref={anchorRef} onMouseEnter={handleOpen} onMouseLeave={handleClose} onFocus={handleOpen}>
-			{children}
+		<>
+			{children({ onMouseEnter: handleOpen, onMouseLeave: handleClose, onFocus: handleOpen })}
 			<Transition
 				nodeRef={floatingContainerRef}
 				in={isOpen}
@@ -62,6 +68,6 @@ export const Tooltip: FC<ITooltipProps> = ({
 					</Portal>
 				)}
 			</Transition>
-		</div>
+		</>
 	);
 };

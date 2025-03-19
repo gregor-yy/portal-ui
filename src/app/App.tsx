@@ -55,7 +55,16 @@ const DrawerDemo = () => {
 const TooltipDemo = () => {
 	return (
 		<Tooltip content="I am Tooltip!!!" isArrowShow>
-			<button className={styles.button}>Open Tooltip</button>
+			{({ onMouseEnter, onMouseLeave, onFocus }) => (
+				<button
+					className={styles.button}
+					onMouseEnter={onMouseEnter}
+					onMouseLeave={onMouseLeave}
+					onFocus={onFocus}
+				>
+					Open Tooltip
+				</button>
+			)}
 		</Tooltip>
 	);
 };
@@ -100,7 +109,11 @@ const DropdownDemo = () => {
 	return (
 		<Dropdown>
 			<Dropdown.Trigger>
-				<button className={styles.button}>Open Dropdown</button>
+				{({ triggerId, handleOpen }) => (
+					<button className={styles.button} id={triggerId} onClick={handleOpen}>
+						Open Dropdown
+					</button>
+				)}
 			</Dropdown.Trigger>
 			<Dropdown.Menu>
 				<Dropdown.Item>Profile</Dropdown.Item>

@@ -4,4 +4,4 @@ interface IAppContextData {
   dialogStack: string[];
 }
 
-export const { Provider: AppProvider, useSelector, useUpdate } = createOptimizedContext<IAppContextData>();
+export const { Provider: AppProvider, useSelector: useAppSelector, useUpdate: useAppUpdate } = createOptimizedContext<IAppContextData>();

@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { FocusEvent, MouseEvent, useLayoutEffect, useRef, useState } from 'react';
 
 import { DEFAULT_TOOLTIP_OFFSET_PX } from '../constants';
 import { TTooltipPlacement } from '../types';
@@ -9,18 +9,17 @@ interface IUseTooltipProps {
 }
 
 export const useTooltip = ({ placement, offset = DEFAULT_TOOLTIP_OFFSET_PX }: IUseTooltipProps) => {
-	const anchorRef = useRef<HTMLDivElement | null>(null);
+	const [anchor, setAnchor] = useState<HTMLElement | null>(null);
 	const floatingContainerRef = useRef<HTMLDivElement | null>(null);
 
-	const [isOpen, setIsOpen] = useState(false);
+	const isOpen = !!anchor;
 
-	const handleOpen = () => setIsOpen(true);
-	const handleClose = () => setIsOpen(false);
+	const handleOpen = (event: MouseEvent<HTMLElement> | FocusEvent<HTMLElement>) => setAnchor(event.currentTarget);
+	const handleClose = () => setAnchor(null);
 
 	useLayoutEffect(() => {
 		if (!isOpen) return;
 
-		const anchor = anchorRef.current;
 		const floatingContainer = floatingContainerRef.current;
 
 		if (!(anchor && floatingContainer)) return;
@@ -93,5 +92,5 @@ export const useTooltip = ({ placement, offset = DEFAULT_TOOLTIP_OFFSET_PX }: IU
 		floatingContainer.style.left = `${floatingContainerLeft}px`;
 	}, [isOpen, placement, offset]);
 
-	return { anchorRef, floatingContainerRef, isOpen, handleOpen, handleClose };
+	return { floatingContainerRef, isOpen, handleOpen, handleClose };
 };

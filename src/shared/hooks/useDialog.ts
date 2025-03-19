@@ -1,7 +1,7 @@
 import { useEffect, useId, useLayoutEffect } from 'react';
 
 import { getScrollbarWidth } from '../lib/getScrollbarWidth';
-import { useSelector, useUpdate } from '../store';
+import { useAppSelector, useAppUpdate } from '../store';
 
 interface IUseDialogStackProps {
 	isOpen: boolean;
@@ -10,8 +10,8 @@ interface IUseDialogStackProps {
 
 export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
 	const id = useId();
-	const stack = useSelector((store) => store.dialogStack);
-	const update = useUpdate();
+	const stack = useAppSelector((store) => store.dialogStack);
+	const update = useAppUpdate();
 
 	useEffect(() => {
 		if (!isOpen) return;

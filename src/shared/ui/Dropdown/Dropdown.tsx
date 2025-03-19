@@ -1,20 +1,9 @@
-import {
-	Children,
-	cloneElement,
-	FC,
-	Fragment,
-	isValidElement,
-	MouseEvent,
-	ReactNode,
-	useId,
-	useRef,
-	useState,
-} from 'react';
+import { FC, MouseEvent, ReactElement, ReactNode, useId, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useDialog, usePopover } from '@/shared/hooks';
-import { classNames } from '@/shared/lib';
+import { classNames, createOptimizedContext } from '@/shared/lib';
 import { TPopoverPlacement } from '@/shared/types';
 
 import { Backdrop } from '../Backdrop';
@@ -24,31 +13,45 @@ import { Portal } from '../Portal';
 
 import styles from './Dropdown.module.css';
 
+type TDropdownContextData = {
+	triggerId: string;
+	anchorEl: HTMLElement | null;
+};
+
+const { Provider, useSelector, useUpdate } = createOptimizedContext<TDropdownContextData>();
+
+type TTriggerChildrenProps = {
+	triggerId: string;
+	handleOpen: (event: MouseEvent<HTMLElement>) => void;
+};
+
 interface ITriggerProps {
-	id?: string;
-	children: ReactNode;
-	onClick?: (event: MouseEvent<HTMLElement>) => void;
+	children: (props: TTriggerChildrenProps) => ReactElement;
 }
 
-export const Trigger: FC<ITriggerProps> = ({ id, children, onClick }) => {
-	return (
-		<div id={id} onClick={onClick}>
-			{children}
-		</div>
-	);
+export const Trigger: FC<ITriggerProps> = ({ children }) => {
+	const { triggerId } = useSelector((store) => store);
+	const update = useUpdate();
+
+	const handleOpen = (event: MouseEvent<HTMLElement>) => update({ anchorEl: event.currentTarget });
+
+	return children({ triggerId, handleOpen });
 };
+
+type TTrigger = typeof Trigger;
 
 interface IItemProps {
 	children: ReactNode;
 	onClick?: () => void;
-	onClose?: () => void;
 	className?: string;
 }
 
-export const Item: FC<IItemProps> = ({ children, onClose, onClick, className }) => {
+export const Item: FC<IItemProps> = ({ children, onClick, className }) => {
+	const update = useUpdate();
+
 	const handleSelect = () => {
-		if (onClose) onClose();
 		if (onClick) onClick();
+		update({ anchorEl: null });
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent<HTMLLIElement>) => {
@@ -57,6 +60,7 @@ export const Item: FC<IItemProps> = ({ children, onClose, onClick, className }) 
 			handleSelect();
 		}
 	};
+
 	return (
 		<li
 			tabIndex={0}
@@ -70,22 +74,20 @@ export const Item: FC<IItemProps> = ({ children, onClose, onClick, className }) 
 	);
 };
 
+type TItem = typeof Item;
+
+type IMenuChild = ReactElement<TItem>;
+
 interface IMenuProps {
-	triggerId?: string;
 	isOpen?: boolean;
-	onClose?: () => void;
-	anchorEl?: HTMLElement | null;
-	children: ReactNode;
+	children: IMenuChild | IMenuChild[];
 	anchorPlacement?: TPopoverPlacement;
 	placement?: TPopoverPlacement;
 	className?: string;
 }
 
 export const Menu: FC<IMenuProps> = ({
-	triggerId,
-	isOpen = false,
-	onClose,
-	anchorEl,
+	isOpen: isOpenProp = false,
 	children,
 	anchorPlacement = 'bottom-center',
 	placement = 'bottom-center',
@@ -93,9 +95,18 @@ export const Menu: FC<IMenuProps> = ({
 }) => {
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 
+	const { triggerId, anchorEl } = useSelector((store) => store);
+	const update = useUpdate();
+
+	const isOpen = isOpenProp || !!anchorEl;
+
+	const handleClose = () => {
+		update({ anchorEl: null });
+	};
+
 	const { floatingContainerRef } = usePopover({ isOpen, anchorEl, anchorPlacement, placement });
 
-	useDialog({ isOpen, onClose });
+	useDialog({ isOpen, onClose: handleClose });
 
 	return (
 		<Transition nodeRef={transitionRef} in={isOpen} timeout={SYSTEM_TRANSITION_MS_100} mountOnEnter unmountOnExit>
@@ -107,7 +118,7 @@ export const Menu: FC<IMenuProps> = ({
 						})}
 						ref={transitionRef}
 					>
-						<Backdrop className={styles.backdrop} onClick={onClose} />
+						<Backdrop className={styles.backdrop} onClick={handleClose} />
 						<FocusTrap>
 							<FloatingContainer
 								ref={floatingContainerRef}
@@ -115,12 +126,7 @@ export const Menu: FC<IMenuProps> = ({
 								className={classNames(styles.body, className)}
 							>
 								<ul role="menu" aria-labelledby={triggerId}>
-									{Children.map(children, (child) => {
-										if (isValidElement<IItemProps>(child) && child.type === Item) {
-											return cloneElement<IItemProps>(child, { onClick: onClose });
-										}
-										return child;
-									})}
+									{children}
 								</ul>
 							</FloatingContainer>
 						</FocusTrap>
@@ -131,44 +137,22 @@ export const Menu: FC<IMenuProps> = ({
 	);
 };
 
+type TMenu = typeof Menu;
+
+type IDropdownChild = ReactElement<TTrigger> | ReactElement<TMenu>;
+
 interface IDropdownProps {
-	children: ReactNode;
+	children: IDropdownChild | IDropdownChild[];
 }
 
 export const Dropdown: FC<IDropdownProps> & {
-	Trigger: typeof Trigger;
-	Menu: typeof Menu;
-	Item: typeof Item;
+	Trigger: TTrigger;
+	Menu: TMenu;
+	Item: TItem;
 } = ({ children }) => {
 	const triggerId = useId();
-	const [popoverAnchorEl, setPopoverAnchorEl] = useState<HTMLElement | null>(null);
 
-	const handleOpen = (event: MouseEvent<HTMLElement>) => {
-		setPopoverAnchorEl(event.currentTarget);
-	};
-
-	const handleClose = () => {
-		setPopoverAnchorEl(null);
-	};
-
-	return (
-		<Fragment>
-			{Children.map(children, (child) => {
-				if (isValidElement<ITriggerProps>(child) && child.type === Trigger) {
-					return cloneElement<ITriggerProps>(child, { id: triggerId, onClick: handleOpen });
-				}
-				if (isValidElement<IMenuProps>(child) && child.type === Menu) {
-					return cloneElement<IMenuProps>(child, {
-						isOpen: !!popoverAnchorEl,
-						anchorEl: popoverAnchorEl,
-						onClose: handleClose,
-						triggerId,
-					});
-				}
-				return null;
-			})}
-		</Fragment>
-	);
+	return <Provider initialState={{ triggerId, anchorEl: null }}>{children}</Provider>;
 };
 
 Dropdown.Trigger = Trigger;
