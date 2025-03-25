@@ -2,15 +2,15 @@
     pointer-events: none;
     position: fixed;
     inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     opacity: 0;
     transition: opacity var(--system-transition-100);
 }
 
 .body {
-    position: relative;
+    position: absolute;
+    top: 50%;
+    left: 50vw;
+    transform: translate(-50%, -50%);
     background-color: var(--system-color-light-500);
     padding: var(--system-spacing-400);
     border-radius: var(--system-radius-200);

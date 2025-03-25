@@ -1,9 +1,9 @@
-import { FC, ReactNode, useLayoutEffect, useRef } from 'react';
+import { FC, ReactNode, useRef } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useDialog } from '@/shared/hooks';
-import { classNames, getScrollbarWidth } from '@/shared/lib';
+import { classNames } from '@/shared/lib';
 
 import { Backdrop } from '../Backdrop';
 import { FocusTrap } from '../FocusTrap';
@@ -27,23 +27,6 @@ export const Modal: FC<IModalProps> = ({ isOpen, onClose, children, classes }) =
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	useDialog({ isOpen, onClose });
-
-	useLayoutEffect(() => {
-		if (!isOpen) return;
-
-		const container = containerRef.current;
-		if (!container) return;
-
-		const previousInlinePaddingRight = container.style.paddingRight;
-		const previousPaddingRight = parseInt(window.getComputedStyle(container).getPropertyValue('padding-right'));
-		const scrollbarWidth = getScrollbarWidth();
-
-		container.style.paddingRight = `${previousPaddingRight + scrollbarWidth}px`;
-
-		return () => {
-			container.style.paddingRight = previousInlinePaddingRight;
-		};
-	}, [isOpen]);
 
 	return (
 		<Transition timeout={SYSTEM_TRANSITION_MS_100} nodeRef={containerRef} in={isOpen} mountOnEnter unmountOnExit>
