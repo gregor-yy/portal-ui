@@ -1,0 +1,15 @@
+.container {
+    pointer-events: none;
+}
+
+.container.enter {
+    pointer-events: inherit;
+}
+
+.body {
+    padding: var(--system-spacing-200) var(--system-spacing-700);
+}
+
+.backdrop {
+    background-color: transparent;
+}
