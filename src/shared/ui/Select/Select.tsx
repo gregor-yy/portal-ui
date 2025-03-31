@@ -186,7 +186,6 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 								ref={floatingContainerRef}
 								isOpen={status === 'entering' || status === 'entered'}
 								className={classNames(styles.body, classes?.dropdown)}
-								style={{ maxWidth: containerRef.current?.clientWidth }}
 							>
 								<ul className={styles.list} role="listbox" ref={listboxRef}>
 									{children}

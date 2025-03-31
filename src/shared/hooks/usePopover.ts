@@ -28,7 +28,7 @@ export const usePopover = ({
 		if (!(anchor && floatingContainer)) return;
 
 		if (isAnchorWidth) {
-			floatingContainer.style.minWidth = `${anchor.offsetWidth}px`;
+			floatingContainer.style.width = `${anchor.offsetWidth}px`;
 		}
 
 		let anchorHorizontalPosition = 0;
