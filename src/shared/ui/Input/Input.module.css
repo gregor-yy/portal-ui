@@ -1,0 +1,10 @@
+.container {
+	outline: 2px solid transparent;
+	border-radius: var(--system-radius-100);
+	padding: var(--system-spacing-400);
+	transition: outline var(--system-transition-100);
+}
+
+.container:focus {
+	outline: 2px solid var(--system-color-action-500);
+}

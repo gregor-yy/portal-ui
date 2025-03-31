@@ -15,6 +15,7 @@ type TTooltipChildrenProps = {
 	onMouseEnter: MouseEventHandler<HTMLElement>;
 	onMouseLeave: MouseEventHandler<HTMLElement>;
 	onFocus: FocusEventHandler<HTMLElement>;
+	onBlur: FocusEventHandler<HTMLElement>;
 };
 
 interface ITooltipProps {
@@ -41,7 +42,12 @@ export const Tooltip: FC<ITooltipProps> = ({
 
 	return (
 		<>
-			{children({ onMouseEnter: handleOpen, onMouseLeave: handleClose, onFocus: handleOpen })}
+			{children({
+				onMouseEnter: handleOpen,
+				onMouseLeave: handleClose,
+				onFocus: handleOpen,
+				onBlur: handleClose,
+			})}
 			<Transition
 				nodeRef={floatingContainerRef}
 				in={isOpen}

@@ -6,9 +6,10 @@ import { useAppSelector, useAppUpdate } from '../store';
 interface IUseDialogStackProps {
 	isOpen: boolean;
 	onClose?: () => void;
+	inert?: boolean;
 }
 
-export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
+export const useDialog = ({ isOpen, onClose, inert = true }: IUseDialogStackProps) => {
 	const id = useId();
 	const stack = useAppSelector((store) => store.dialogStack);
 	const update = useAppUpdate();
@@ -49,13 +50,13 @@ export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
 		document.body.style.paddingRight = `${previousPaddingRight + scrollbarWidth}px`;
 
 		const root = document.getElementById('root');
-		if (root) root.inert = true;
+		if (root && inert) root.inert = true;
 
 		return () => {
 			document.body.style.overflow = previousOverflow;
 			document.body.style.paddingRight = previousInlinePaddingRight;
 
-			if (root) root.removeAttribute('inert');
+			if (root && inert) root.removeAttribute('inert');
 		};
 	}, [isOpen]);
 };

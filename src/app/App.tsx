@@ -1,6 +1,6 @@
-import { Fragment, MouseEvent, useId, useState } from 'react';
+import { Fragment, MouseEvent, useEffect, useId, useMemo, useState } from 'react';
 
-import { Drawer, Dropdown, Modal, Popover, Tooltip } from '@/shared/ui';
+import { Button, Drawer, Dropdown, Modal, Popover, Select, Tooltip } from '@/shared/ui';
 
 import styles from './App.module.css';
 
@@ -12,6 +12,8 @@ export const App = () => {
 			<TooltipDemo />
 			<PopoverDemo />
 			<DropdownDemo />
+			<SelectDemo />
+			<AsyncSelectDemo />
 		</div>
 	);
 };
@@ -20,9 +22,7 @@ const ModalDemo = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	return (
 		<Fragment>
-			<button className={styles.button} onClick={() => setIsModalOpen(true)}>
-				Open Modal
-			</button>
+			<Button onClick={() => setIsModalOpen(true)}>Open Modal</Button>
 			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
 				<p style={{ maxWidth: '300px' }}>
 					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut, aperiam reprehenderit, libero aliquid
@@ -38,9 +38,9 @@ const DrawerDemo = () => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	return (
 		<Fragment>
-			<button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
+			<Button className={styles.button} onClick={() => setIsDrawerOpen(true)}>
 				Open Drawer
-			</button>
+			</Button>
 			<Drawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)}>
 				<p style={{ maxWidth: '300px' }}>
 					Lorem ipsum dolor sit amet consectetur, adipisicing elit. Ut, aperiam reprehenderit, libero aliquid
@@ -55,15 +55,10 @@ const DrawerDemo = () => {
 const TooltipDemo = () => {
 	return (
 		<Tooltip content="I am Tooltip!!!" isArrowShow>
-			{({ onMouseEnter, onMouseLeave, onFocus }) => (
-				<button
-					className={styles.button}
-					onMouseEnter={onMouseEnter}
-					onMouseLeave={onMouseLeave}
-					onFocus={onFocus}
-				>
+			{({ onMouseEnter, onMouseLeave, onFocus, onBlur }) => (
+				<Button onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onFocus={onFocus} onBlur={onBlur}>
 					Open Tooltip
-				</button>
+				</Button>
 			)}
 		</Tooltip>
 	);
@@ -86,9 +81,9 @@ const PopoverDemo = () => {
 
 	return (
 		<Fragment>
-			<button id={buttonAriaDescribedbyId} className={styles.button} onClick={handleOpen}>
+			<Button id={buttonAriaDescribedbyId} onClick={handleOpen}>
 				Open Popover
-			</button>
+			</Button>
 			<Popover
 				id={buttonAriaDescribedbyId}
 				isOpen={isPopoverOpen}
@@ -110,9 +105,9 @@ const DropdownDemo = () => {
 		<Dropdown>
 			<Dropdown.Trigger>
 				{({ triggerId, handleOpen }) => (
-					<button className={styles.button} id={triggerId} onClick={handleOpen}>
+					<Button className={styles.button} id={triggerId} onClick={handleOpen}>
 						Open Dropdown
-					</button>
+					</Button>
 				)}
 			</Dropdown.Trigger>
 			<Dropdown.Menu>
@@ -121,5 +116,105 @@ const DropdownDemo = () => {
 				<Dropdown.Item>Logout</Dropdown.Item>
 			</Dropdown.Menu>
 		</Dropdown>
+	);
+};
+
+const SelectDemo = () => {
+	const [value, setValue] = useState<string>('');
+	const [searchValue, setSearchValue] = useState<string>('');
+
+	const options = [
+		{ value: 'Apples', label: '🍎 Apples' },
+		{ value: 'Bananas', label: '🍌 Bananas' },
+		{ value: 'Broccoli', label: '🥦 Broccoli' },
+		{ value: 'Carrots', label: '🥕 Carrots' },
+		{ value: 'Chocolate', label: '🍫 Chocolate' },
+		{ value: 'Grapes', label: '🍇 Grapes' },
+	];
+
+	const filteredOptions = useMemo(() => {
+		if (!searchValue) return options;
+		return options.filter((option) => option.label.toLowerCase().includes(searchValue.toLowerCase()));
+	}, [options, searchValue]);
+
+	const handleSearch = (value: string) => {
+		setSearchValue(value);
+	};
+
+	return (
+		<Select value={value} onChange={(value) => setValue(value)} onSearch={handleSearch} placeholder="Select">
+			{filteredOptions.length > 0 ? (
+				filteredOptions.map((option) => (
+					<Select.Option key={option.value} value={option.value}>
+						{option.label}
+					</Select.Option>
+				))
+			) : (
+				<Select.Option disabled>No data</Select.Option>
+			)}
+		</Select>
+	);
+};
+
+type User = {
+	id: number;
+	name: string;
+	email: string;
+};
+
+const AsyncSelectDemo = () => {
+	const [value, setValue] = useState<string>('');
+	const [searchValue, setSearchValue] = useState<string>('');
+	const [users, setUsers] = useState<User[]>([]);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		const fetchUsers = async () => {
+			setLoading(true);
+			try {
+				const response = await fetch(
+					`https://jsonplaceholder.typicode.com/users${searchValue ? `?name_like=${searchValue}` : ''}`,
+				);
+				const data = await response.json();
+				setUsers(data);
+			} catch (error) {
+				console.error('Error fetching users:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		const timer = setTimeout(() => {
+			fetchUsers();
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [searchValue]);
+
+	const options = useMemo(() => {
+		return users.map((user) => ({
+			value: user.id.toString(),
+			label: `${user.name} (${user.email})`,
+		}));
+	}, [users]);
+
+	const handleSearch = (value: string) => {
+		setSearchValue(value);
+	};
+
+	return (
+		<Select value={value} onChange={setValue} onSearch={handleSearch} placeholder="Async Select">
+			{loading ? (
+				<Select.Option disabled>Loading...</Select.Option>
+			) : options.length > 0 ? (
+				options.map((option) => (
+					<Select.Option key={option.value} value={option.value}>
+						{option.label}
+					</Select.Option>
+				))
+			) : (
+				<Select.Option disabled>No data</Select.Option>
+			)}
+		</Select>
 	);
 };

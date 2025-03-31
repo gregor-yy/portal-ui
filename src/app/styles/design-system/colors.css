@@ -1,11 +1,12 @@
 :root {
 	/* Action */
 	--system-color-action-500: #3498db;
-    /* Light */
+	/* Light */
 	--system-color-light-500: #ecf0f1;
 	/* Gray */
 	--system-color-gray-500: #bdc3c7;
-    /* Dark */
+	/* Dark */
+	--system-color-dark-300: #4b6e91;
 	--system-color-dark-400: #3f5c79;
 	--system-color-dark-500: #2c3e50;
 	--system-color-dark-500-opaque-500: #00000050;

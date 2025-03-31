@@ -7,9 +7,16 @@ interface IUsePopoverProps {
 	anchorEl?: HTMLElement | null;
 	anchorPlacement: TPopoverPlacement;
 	placement: TPopoverPlacement;
+	isAnchorWidth?: boolean;
 }
 
-export const usePopover = ({ isOpen, anchorEl, anchorPlacement, placement }: IUsePopoverProps) => {
+export const usePopover = ({
+	isOpen,
+	anchorEl,
+	anchorPlacement,
+	placement,
+	isAnchorWidth = false,
+}: IUsePopoverProps) => {
 	const floatingContainerRef = useRef<HTMLDivElement | null>(null);
 
 	useLayoutEffect(() => {
@@ -19,6 +26,10 @@ export const usePopover = ({ isOpen, anchorEl, anchorPlacement, placement }: IUs
 		const floatingContainer = floatingContainerRef.current;
 
 		if (!(anchor && floatingContainer)) return;
+
+		if (isAnchorWidth) {
+			floatingContainer.style.minWidth = `${anchor.offsetWidth}px`;
+		}
 
 		let anchorHorizontalPosition = 0;
 		let anchorVerticalPosition = 0;
