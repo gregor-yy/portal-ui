@@ -9,6 +9,8 @@ interface IUseDialogStackProps {
 	inert?: boolean;
 }
 
+const root = document.getElementById('root');
+
 export const useDialog = ({ isOpen, onClose, inert = true }: IUseDialogStackProps) => {
 	const id = useId();
 	const stack = useAppSelector((store) => store.dialogStack);
@@ -41,6 +43,7 @@ export const useDialog = ({ isOpen, onClose, inert = true }: IUseDialogStackProp
 	useLayoutEffect(() => {
 		if (!isOpen) return;
 
+		const previousInert = root?.inert;
 		const previousOverflow = document.body.style.overflow;
 		const previousInlinePaddingRight = document.body.style.paddingRight;
 		const previousPaddingRight = parseInt(window.getComputedStyle(document.body).getPropertyValue('padding-right'));
@@ -49,14 +52,16 @@ export const useDialog = ({ isOpen, onClose, inert = true }: IUseDialogStackProp
 		document.body.style.overflow = 'hidden';
 		document.body.style.paddingRight = `${previousPaddingRight + scrollbarWidth}px`;
 
-		const root = document.getElementById('root');
 		if (root && inert) root.inert = true;
 
 		return () => {
 			document.body.style.overflow = previousOverflow;
 			document.body.style.paddingRight = previousInlinePaddingRight;
 
-			if (root && inert) root.removeAttribute('inert');
+			if (root && inert) {
+				if (previousInert) root.inert = previousInert;
+				else root.removeAttribute('inert');
+			}
 		};
 	}, [isOpen]);
 };
