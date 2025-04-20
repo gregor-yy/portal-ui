@@ -10,4 +10,6 @@
 	--system-color-dark-400: #3f5c79;
 	--system-color-dark-500: #2c3e50;
 	--system-color-dark-500-opaque-500: #00000050;
+	/* Danger */
+	--system-color-danger-500: #e74c3c;
 }

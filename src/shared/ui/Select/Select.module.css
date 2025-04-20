@@ -74,3 +74,9 @@
 	padding: var(--system-spacing-400);
 	text-align: center;
 }
+
+.dropdownError {
+	padding: var(--system-spacing-400);
+	text-align: center;
+	color: var(--system-color-danger-500);
+}

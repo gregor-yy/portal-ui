@@ -149,6 +149,23 @@ const SelectDemo = () => {
 	);
 };
 
+const fetchUsers = (nameLike: string | null, signal: AbortSignal) => {
+	return fetch(`https://jsonplaceholder.typicode.com/users${nameLike ? `?name_like=${nameLike}` : ''}`, {
+		signal,
+	}).then((response) => {
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		return response.json();
+	});
+};
+
+enum EStatus {
+	LOADING = 'LOADING',
+	SUCCESS = 'SUCCESS',
+	ERROR = 'ERROR',
+}
+
 type User = {
 	id: number;
 	name: string;
@@ -159,30 +176,29 @@ const AsyncSelectDemo = () => {
 	const [value, setValue] = useState<string>('');
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const [users, setUsers] = useState<User[]>([]);
-	const [loading, setLoading] = useState(false);
+	const [isOpen, setIsOpen] = useState(false);
+	const [status, setStatus] = useState<EStatus>(EStatus.SUCCESS);
 
 	useEffect(() => {
-		const fetchUsers = async () => {
-			setLoading(true);
-			try {
-				const response = await fetch(
-					`https://jsonplaceholder.typicode.com/users${searchValue ? `?name_like=${searchValue}` : ''}`,
-				);
-				const data = await response.json();
-				setUsers(data);
-			} catch (error) {
-				console.error('Error fetching users:', error);
-			} finally {
-				setLoading(false);
-			}
-		};
+		if (isOpen) {
+			setStatus(EStatus.LOADING);
+			const controller = new AbortController();
 
-		const timer = setTimeout(() => {
-			fetchUsers();
-		}, 300);
+			fetchUsers(searchValue, controller.signal)
+				.then((data) => {
+					setUsers(data);
+					setStatus(EStatus.SUCCESS);
+				})
+				.catch(() => {
+					if (controller.signal.aborted) return;
+					else setStatus(EStatus.ERROR);
+				});
 
-		return () => clearTimeout(timer);
-	}, [searchValue]);
+			return () => {
+				controller.abort();
+			};
+		}
+	}, [isOpen, searchValue]);
 
 	const options = useMemo(() => {
 		return users.map((user) => ({
@@ -193,14 +209,17 @@ const AsyncSelectDemo = () => {
 
 	return (
 		<Select
+			isOpen={isOpen}
+			onOpenChange={setIsOpen}
 			value={value}
 			options={options}
 			onChange={setValue}
 			searchValue={searchValue}
 			onSearch={setSearchValue}
 			placeholder="Async Select"
-			loading={loading}
+			loading={status === EStatus.LOADING}
 			notFoundMessage="Not found ☹️"
+			dropdownError={status === EStatus.ERROR && 'Something went wrong'}
 		/>
 	);
 };

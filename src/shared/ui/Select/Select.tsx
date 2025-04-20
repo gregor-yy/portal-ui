@@ -1,9 +1,9 @@
-import { ChangeEvent, FC, ReactNode, useId, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, FC, ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useDialog, usePopover } from '@/shared/hooks';
-import { classNames, isBoolean } from '@/shared/lib';
+import { classNames, isBoolean, isString } from '@/shared/lib';
 
 import { Backdrop } from '../Backdrop';
 import { FloatingContainer } from '../FloatingContainer';
@@ -22,10 +22,15 @@ type TSelectOption = {
 	label: string;
 };
 
+type TSelectClasses = { input?: string; dropdown?: string; list?: string; option?: string; notFound?: string };
+
 const defaultRenderOption = (option: TSelectOption) => option.label;
 
 interface ISelectProps {
-	classes?: { input?: string; dropdown?: string; list?: string; option?: string; notFound?: string };
+	isOpen?: boolean;
+	onOpenChange?: (isOpen: boolean) => void;
+
+	classes?: TSelectClasses;
 
 	options: TSelectOption[];
 	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
@@ -36,12 +41,15 @@ interface ISelectProps {
 	loading?: boolean | ReactNode;
 	searchValue?: TSelectSearchValue;
 	onSearch?: (value: TSelectSearchValue) => void;
+	dropdownError?: ReactNode;
 
 	placeholder?: string;
 	notFoundMessage?: string;
 }
 
 export const Select: FC<ISelectProps> = ({
+	isOpen: isOpenProp,
+	onOpenChange: setIsOpenProp,
 	classes,
 	options,
 	renderOption = defaultRenderOption,
@@ -50,6 +58,7 @@ export const Select: FC<ISelectProps> = ({
 	loading,
 	searchValue = null,
 	onSearch,
+	dropdownError,
 	placeholder,
 	notFoundMessage,
 }) => {
@@ -58,15 +67,28 @@ export const Select: FC<ISelectProps> = ({
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const listboxRef = useRef<HTMLUListElement | null>(null);
 
-	const [isOpen, setIsOpen] = useState(false);
+	const [isOpenState, setIsOpenState] = useState(false);
+
+	const isOpen = useMemo(() => (isOpenProp !== undefined ? isOpenProp : isOpenState), [isOpenState, isOpenProp]);
+	const setIsOpen = useCallback(
+		(isOpen: boolean) => {
+			if (isOpenProp !== undefined) {
+				if (setIsOpenProp) setIsOpenProp(isOpen);
+			} else {
+				setIsOpenState(isOpen);
+			}
+		},
+		[setIsOpenState, setIsOpenProp, isOpenProp],
+	);
 
 	const inputValue = useMemo(() => (searchValue !== null ? searchValue : value), [value, searchValue]);
 
 	const isSearchable = !!onSearch;
-	const isShowLoader = !!loading;
-	const isEmptyOptions = options.length === 0;
-	const isShowNotFoundMessage = !isShowLoader && notFoundMessage && isEmptyOptions;
-	const isShowOptions = !isShowLoader && !isShowNotFoundMessage;
+	const isShowDropdownError = !!dropdownError;
+	const isShowLoader = !isShowDropdownError && !!loading;
+	const isEmptyOptions = !isShowDropdownError && options.length === 0;
+	const isShowNotFoundMessage = !isShowDropdownError && !isShowLoader && notFoundMessage && isEmptyOptions;
+	const isShowOptions = !isShowDropdownError && !isShowLoader && !isShowNotFoundMessage;
 	const isHideEmptyDropdown = isShowOptions && isEmptyOptions;
 
 	const handleOpen = () => {
@@ -140,6 +162,11 @@ export const Select: FC<ISelectProps> = ({
 									classes?.dropdown,
 								)}
 							>
+								{isShowDropdownError && isString(dropdownError) ? (
+									<p className={classNames(styles.dropdownError)}>{dropdownError}</p>
+								) : (
+									dropdownError
+								)}
 								{isShowLoader &&
 									(isBoolean(loading) ? (
 										<div className={styles.loaderContainer}>
