@@ -5,8 +5,8 @@ import {
 	ReactElement,
 	ReactNode,
 	useContext,
-	useEffect,
 	useId,
+	useMemo,
 	useRef,
 	useState,
 } from 'react';
@@ -77,7 +77,8 @@ interface ISelectProps {
 	value?: TSelectValue;
 	placeholder?: string;
 	onChange?: (value: TSelectValue) => void;
-	onSearch?: (value: string) => void;
+	searchValue?: string | null;
+	onSearch?: (value: string | null) => void;
 }
 
 export const Select: FC<ISelectProps> & { Option: TOption } = ({
@@ -86,6 +87,7 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 	value,
 	placeholder,
 	onChange,
+	searchValue,
 	onSearch,
 }) => {
 	const id = useId();
@@ -95,47 +97,21 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 
 	const [isOpen, setIsOpen] = useState(false);
 
-	const [inputValue, setInputValue] = useState<string>('');
-
-	const [optionValue, setOptionValue] = useState<string | null>(null);
-	const [searchValue, setSearchValue] = useState<string | null>(null);
+	const inputValue = useMemo(() => (searchValue !== null ? searchValue : value), [value, searchValue]);
 
 	const isSearchable = !!onSearch;
 
 	const handleOpen = () => setIsOpen(true);
 	const handleClose = () => {
 		setIsOpen(false);
-		setSearchValue(null);
+		if (isSearchable) onSearch(null);
 	};
 	const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-		if (onSearch) {
+		if (isSearchable) {
 			const { value } = event.target;
-			setSearchValue(value);
 			onSearch(value);
 		}
 	};
-
-	useEffect(() => {
-		if (listboxRef.current) {
-			const option = listboxRef.current.querySelector(`li[role="option"][data-value="${value}"]`);
-
-			if (option && option.textContent) {
-				setOptionValue(option.textContent);
-			} else {
-				setOptionValue(null);
-			}
-		}
-	}, [value]);
-
-	useEffect(() => {
-		if (optionValue && searchValue === null) {
-			setInputValue(optionValue);
-		} else if (searchValue) {
-			setInputValue(searchValue);
-		} else {
-			setInputValue('');
-		}
-	}, [optionValue, searchValue]);
 
 	const { floatingContainerRef } = usePopover({
 		isOpen,
