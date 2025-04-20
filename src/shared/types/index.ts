@@ -8,4 +8,4 @@ export type TPopoverPlacement =
 	| 'center-right'
 	| 'bottom-left'
 	| 'bottom-center'
-	| 'bottom-right'
+	| 'bottom-right';

@@ -1,3 +1,7 @@
+.anchor {
+	position: relative;
+}
+
 .container {
 	pointer-events: none;
 }
@@ -16,6 +20,10 @@
 	padding: var(--system-spacing-200) 0;
 }
 
+.body.hidden {
+	display: none;
+}
+
 .list {
 	list-style: none;
 }
@@ -25,20 +33,12 @@
 	padding: var(--system-spacing-300) var(--system-spacing-400);
 }
 
-.option:not(.disabled):hover {
+.option:hover {
 	background-color: var(--system-color-dark-400);
 }
 
 .option.selected {
 	background-color: var(--system-color-dark-300);
-}
-
-.option.disabled {
-	cursor: not-allowed;
-}
-
-.anchor {
-	position: relative;
 }
 
 .field {
@@ -57,4 +57,20 @@
 	stroke: var(--system-color-dark-500);
 	width: 24px;
 	height: 24px;
+}
+
+.loaderContainer {
+	display: flex;
+	justify-content: center;
+	padding: var(--system-spacing-400) 0;
+}
+
+.loader {
+	width: 32px;
+	height: 32px;
+}
+
+.notFound {
+	padding: var(--system-spacing-400);
+	text-align: center;
 }

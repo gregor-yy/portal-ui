@@ -1,94 +1,57 @@
-import {
-	ChangeEvent,
-	createContext,
-	FC,
-	ReactElement,
-	ReactNode,
-	useContext,
-	useId,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
+import { ChangeEvent, FC, ReactNode, useId, useMemo, useRef, useState } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
 import { useDialog, usePopover } from '@/shared/hooks';
-import { classNames } from '@/shared/lib';
+import { classNames, isBoolean } from '@/shared/lib';
 
 import { Backdrop } from '../Backdrop';
 import { FloatingContainer } from '../FloatingContainer';
 import { Input } from '../Input';
+import { Loader } from '../Loader';
 import { Portal } from '../Portal';
 
 import styles from './Select.module.css';
 
 type TSelectValue = string;
 
-type TDropdownContextData = {
-	value: TSelectValue | undefined;
-	onChange?: (value: TSelectValue) => void;
-	handleClose: () => void;
+type TSelectSearchValue = string | null;
+
+type TSelectOption = {
+	value: TSelectValue;
+	label: string;
 };
 
-const Context = createContext<TDropdownContextData | undefined>(undefined);
-
-interface IOptionProps {
-	value?: TSelectValue;
-	children: ReactNode;
-	className?: string;
-	disabled?: boolean;
-}
-
-const Option: FC<IOptionProps> = ({ value, children, className, disabled }) => {
-	const store = useContext(Context);
-
-	if (!store) return null;
-
-	const { value: selectValue, onChange } = store;
-
-	const isSelected = selectValue === value;
-
-	const handleMouseDown = () => {
-		if (disabled) return;
-		if (onChange && value) onChange(value);
-	};
-
-	return (
-		<li
-			data-value={value}
-			className={classNames(styles.option, isSelected && styles.selected, disabled && styles.disabled, className)}
-			aria-selected={isSelected}
-			onMouseDown={handleMouseDown}
-			role="option"
-		>
-			{children}
-		</li>
-	);
-};
-
-type TOption = typeof Option;
-
-type TSelectChild = ReactElement<TOption>;
+const defaultRenderOption = (option: TSelectOption) => option.label;
 
 interface ISelectProps {
-	classes?: { input?: string; dropdown?: string };
-	children?: TSelectChild | TSelectChild[];
+	classes?: { input?: string; dropdown?: string; list?: string; option?: string; notFound?: string };
+
+	options: TSelectOption[];
+	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
+
 	value?: TSelectValue;
-	placeholder?: string;
 	onChange?: (value: TSelectValue) => void;
-	searchValue?: string | null;
-	onSearch?: (value: string | null) => void;
+
+	loading?: boolean | ReactNode;
+	searchValue?: TSelectSearchValue;
+	onSearch?: (value: TSelectSearchValue) => void;
+
+	placeholder?: string;
+	notFoundMessage?: string;
 }
 
-export const Select: FC<ISelectProps> & { Option: TOption } = ({
+export const Select: FC<ISelectProps> = ({
 	classes,
-	children,
+	options,
+	renderOption = defaultRenderOption,
 	value,
-	placeholder,
 	onChange,
-	searchValue,
+	loading,
+	searchValue = null,
 	onSearch,
+	placeholder,
+	notFoundMessage,
 }) => {
 	const id = useId();
 	const transitionRef = useRef<HTMLDivElement | null>(null);
@@ -100,8 +63,15 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 	const inputValue = useMemo(() => (searchValue !== null ? searchValue : value), [value, searchValue]);
 
 	const isSearchable = !!onSearch;
+	const isShowLoader = !!loading;
+	const isEmptyOptions = options.length === 0;
+	const isShowNotFoundMessage = !isShowLoader && notFoundMessage && isEmptyOptions;
+	const isShowOptions = !isShowLoader && !isShowNotFoundMessage;
+	const isHideEmptyDropdown = isShowOptions && isEmptyOptions;
 
-	const handleOpen = () => setIsOpen(true);
+	const handleOpen = () => {
+		setIsOpen(true);
+	};
 	const handleClose = () => {
 		setIsOpen(false);
 		if (isSearchable) onSearch(null);
@@ -111,6 +81,10 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 			const { value } = event.target;
 			onSearch(value);
 		}
+	};
+	const handleChange = (value: TSelectValue) => {
+		if (onChange && value) onChange(value);
+		handleClose();
 	};
 
 	const { floatingContainerRef } = usePopover({
@@ -124,15 +98,14 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 	useDialog({ isOpen, onClose: handleClose, inert: false });
 
 	return (
-		<Context.Provider value={{ value, onChange, handleClose }}>
+		<>
 			<div className={styles.anchor} ref={containerRef}>
 				<Input
 					placeholder={placeholder}
 					value={inputValue}
 					className={classNames(styles.field, classes?.input)}
 					readOnly={!isSearchable}
-					onFocus={handleOpen}
-					onBlur={handleClose}
+					onClick={handleOpen}
 					onChange={handleSearch}
 				/>
 				<div className={styles.chevron}>
@@ -161,18 +134,55 @@ export const Select: FC<ISelectProps> & { Option: TOption } = ({
 								id={id}
 								ref={floatingContainerRef}
 								isOpen={status === 'entering' || status === 'entered'}
-								className={classNames(styles.body, classes?.dropdown)}
+								className={classNames(
+									styles.body,
+									{ [styles.hidden]: isHideEmptyDropdown },
+									classes?.dropdown,
+								)}
 							>
-								<ul className={styles.list} role="listbox" ref={listboxRef}>
-									{children}
-								</ul>
+								{isShowLoader &&
+									(isBoolean(loading) ? (
+										<div className={styles.loaderContainer}>
+											<Loader className={styles.loader} />
+										</div>
+									) : (
+										loading
+									))}
+								{isShowNotFoundMessage && (
+									<p className={classNames(styles.notFound, classes?.notFound)}>{notFoundMessage}</p>
+								)}
+								{isShowOptions && (
+									<ul
+										className={classNames(styles.list, classes?.list)}
+										role="listbox"
+										ref={listboxRef}
+									>
+										{options.map((option) => {
+											const isSelected = option.value === value;
+											return (
+												<li
+													key={`${option.value} ${option.label}`}
+													data-value={option.value}
+													className={classNames(
+														styles.option,
+														{ [styles.selected]: isSelected },
+														classes?.option,
+													)}
+													aria-selected={isSelected}
+													onClick={() => handleChange(option.value)}
+													role="option"
+												>
+													{renderOption(option, isSelected)}
+												</li>
+											);
+										})}
+									</ul>
+								)}
 							</FloatingContainer>
 						</div>
 					</Portal>
 				)}
 			</Transition>
-		</Context.Provider>
+		</>
 	);
 };
-
-Select.Option = Option;

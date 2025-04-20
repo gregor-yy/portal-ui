@@ -1,4 +1,4 @@
-import { Fragment, MouseEvent, useId, useMemo, useState } from 'react';
+import { Fragment, MouseEvent, useEffect, useId, useMemo, useState } from 'react';
 
 import { Button, Drawer, Dropdown, Modal, Popover, Select, Tooltip } from '@/shared/ui';
 
@@ -13,7 +13,7 @@ export const App = () => {
 			<PopoverDemo />
 			<DropdownDemo />
 			<SelectDemo />
-			{/* <AsyncSelectDemo /> */}
+			<AsyncSelectDemo />
 		</div>
 	);
 };
@@ -119,108 +119,88 @@ const DropdownDemo = () => {
 	);
 };
 
+const options = [
+	{ value: 'Apples', label: '🍎 Apples' },
+	{ value: 'Bananas', label: '🍌 Bananas' },
+	{ value: 'Broccoli', label: '🥦 Broccoli' },
+	{ value: 'Carrots', label: '🥕 Carrots' },
+	{ value: 'Chocolate', label: '🍫 Chocolate' },
+	{ value: 'Grapes', label: '🍇 Grapes' },
+];
+
 const SelectDemo = () => {
 	const [value, setValue] = useState<string>('');
-	const [searchValue, setSearchValue] = useState<string | null>(null);
-
-	const options = [
-		{ value: 'Apples', label: '🍎 Apples' },
-		{ value: 'Bananas', label: '🍌 Bananas' },
-		{ value: 'Broccoli', label: '🥦 Broccoli' },
-		{ value: 'Carrots', label: '🥕 Carrots' },
-		{ value: 'Chocolate', label: '🍫 Chocolate' },
-		{ value: 'Grapes', label: '🍇 Grapes' },
-	];
+	const [searchValue, setSearchValue] = useState<string | null>('');
 
 	const filteredOptions = useMemo(() => {
 		if (!searchValue) return options;
 		return options.filter((option) => option.label.toLowerCase().includes(searchValue.toLowerCase()));
 	}, [options, searchValue]);
 
-	const handleSearch = (value: string | null) => {
-		setSearchValue(value);
-	};
+	return (
+		<Select
+			options={filteredOptions}
+			value={value}
+			onChange={setValue}
+			searchValue={searchValue}
+			onSearch={setSearchValue}
+			placeholder="Select"
+		/>
+	);
+};
+
+type User = {
+	id: number;
+	name: string;
+	email: string;
+};
+
+const AsyncSelectDemo = () => {
+	const [value, setValue] = useState<string>('');
+	const [searchValue, setSearchValue] = useState<string | null>(null);
+	const [users, setUsers] = useState<User[]>([]);
+	const [loading, setLoading] = useState(false);
+
+	useEffect(() => {
+		const fetchUsers = async () => {
+			setLoading(true);
+			try {
+				const response = await fetch(
+					`https://jsonplaceholder.typicode.com/users${searchValue ? `?name_like=${searchValue}` : ''}`,
+				);
+				const data = await response.json();
+				setUsers(data);
+			} catch (error) {
+				console.error('Error fetching users:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		const timer = setTimeout(() => {
+			fetchUsers();
+		}, 300);
+
+		return () => clearTimeout(timer);
+	}, [searchValue]);
+
+	const options = useMemo(() => {
+		return users.map((user) => ({
+			value: user.name,
+			label: `${user.name} (${user.email})`,
+		}));
+	}, [users]);
 
 	return (
 		<Select
 			value={value}
-			onChange={(value) => setValue(value)}
+			options={options}
+			onChange={setValue}
 			searchValue={searchValue}
-			onSearch={handleSearch}
-			placeholder="Select"
-		>
-			{filteredOptions.length > 0 ? (
-				filteredOptions.map((option) => (
-					<Select.Option key={option.value} value={option.value}>
-						{option.label}
-					</Select.Option>
-				))
-			) : (
-				<Select.Option disabled>No data</Select.Option>
-			)}
-		</Select>
+			onSearch={setSearchValue}
+			placeholder="Async Select"
+			loading={loading}
+			notFoundMessage="Not found ☹️"
+		/>
 	);
 };
-
-// type User = {
-// 	id: number;
-// 	name: string;
-// 	email: string;
-// };
-
-// const AsyncSelectDemo = () => {
-// 	const [value, setValue] = useState<string>('');
-// 	const [searchValue, setSearchValue] = useState<string>('');
-// 	const [users, setUsers] = useState<User[]>([]);
-// 	const [loading, setLoading] = useState(false);
-
-// 	useEffect(() => {
-// 		const fetchUsers = async () => {
-// 			setLoading(true);
-// 			try {
-// 				const response = await fetch(
-// 					`https://jsonplaceholder.typicode.com/users${searchValue ? `?name_like=${searchValue}` : ''}`,
-// 				);
-// 				const data = await response.json();
-// 				setUsers(data);
-// 			} catch (error) {
-// 				console.error('Error fetching users:', error);
-// 			} finally {
-// 				setLoading(false);
-// 			}
-// 		};
-
-// 		const timer = setTimeout(() => {
-// 			fetchUsers();
-// 		}, 300);
-
-// 		return () => clearTimeout(timer);
-// 	}, [searchValue]);
-
-// 	const options = useMemo(() => {
-// 		return users.map((user) => ({
-// 			value: user.id.toString(),
-// 			label: `${user.name} (${user.email})`,
-// 		}));
-// 	}, [users]);
-
-// 	const handleSearch = (value: string) => {
-// 		setSearchValue(value);
-// 	};
-
-// 	return (
-// 		<Select value={value} onChange={setValue} onSearch={handleSearch} placeholder="Async Select">
-// 			{loading ? (
-// 				<Select.Option disabled>Loading...</Select.Option>
-// 			) : options.length > 0 ? (
-// 				options.map((option) => (
-// 					<Select.Option key={option.value} value={option.value}>
-// 						{option.label}
-// 					</Select.Option>
-// 				))
-// 			) : (
-// 				<Select.Option disabled>No data</Select.Option>
-// 			)}
-// 		</Select>
-// 	);
-// };
