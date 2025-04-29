@@ -162,11 +162,12 @@ export const Select: FC<ISelectProps> = ({
 									classes?.dropdown,
 								)}
 							>
-								{isShowDropdownError && isString(dropdownError) ? (
-									<p className={classNames(styles.dropdownError)}>{dropdownError}</p>
-								) : (
-									dropdownError
-								)}
+								{isShowDropdownError &&
+									(isString(dropdownError) ? (
+										<p className={classNames(styles.dropdownError)}>{dropdownError}</p>
+									) : (
+										dropdownError
+									))}
 								{isShowLoader &&
 									(isBoolean(loading) ? (
 										<div className={styles.loaderContainer}>
