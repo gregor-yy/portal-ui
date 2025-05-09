@@ -211,9 +211,7 @@ export const Select = <TSelectOption,>({
 										{options.map((option) => {
 											const optionValue = getOptionValue(option);
 											const key = getOptionKey ? getOptionKey(option) : optionValue;
-											const isSelected = Array.isArray(value)
-												? value.includes(optionValue)
-												: optionValue === value;
+											const isSelected = optionValue === value;
 											return (
 												<li
 													key={key}
