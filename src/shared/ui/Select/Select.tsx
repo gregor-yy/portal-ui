@@ -34,11 +34,14 @@ const defaultGetOptionLabel = <TSelectOption,>(option: TSelectOption): string =>
 };
 
 const defaultRenderValue = <TSelectOption,>(value: TSelectOption): string => {
+	if (Array.isArray(value)) {
+		return value.map((item) => (isDefaultSelectOption(item) ? item : '')).join(', ');
+	}
 	if (isDefaultSelectOption(value)) return value;
 	throw new Error('If you are not using a `string` type of options, you must pass the `renderValue` parameter.');
 };
 
-interface ISelectProps<TSelectOption = TDefaultSelectOption> {
+interface ISelectBaseProps<TSelectOption = TDefaultSelectOption> {
 	isOpen?: boolean;
 	onOpenChange?: (isOpen: boolean) => void;
 
@@ -50,18 +53,31 @@ interface ISelectProps<TSelectOption = TDefaultSelectOption> {
 	getOptionLabel?: (option: TSelectOption) => string;
 	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
 
-	value?: TSelectOption;
-	renderValue?: (option: TSelectOption) => string;
 	onChange?: (option: TSelectOption) => void;
 
 	loading?: boolean | ReactNode;
 	searchValue?: TSelectSearchValue;
 	onSearch?: (value: TSelectSearchValue) => void;
+
 	dropdownError?: ReactNode;
 
 	placeholder?: string;
 	notFoundMessage?: string;
 }
+
+interface ISingleSelectProps<TSelectOption> extends ISelectBaseProps<TSelectOption> {
+	multiple?: false;
+	value?: TSelectOption;
+	renderValue?: (option: TSelectOption) => string;
+}
+
+interface IMultipleSelectProps<TSelectOption> extends ISelectBaseProps<TSelectOption> {
+	multiple: true;
+	value?: TSelectOption[];
+	renderValue?: (option: TSelectOption[]) => string;
+}
+
+type TSelectProps<TSelectOption> = ISingleSelectProps<TSelectOption> | IMultipleSelectProps<TSelectOption>;
 
 export const Select = <TSelectOption,>({
 	isOpen: isOpenProp,
@@ -72,6 +88,7 @@ export const Select = <TSelectOption,>({
 	getOptionValue = defaultGetOptionValue,
 	getOptionLabel = defaultGetOptionLabel,
 	renderOption = (option) => <>{getOptionLabel(option)}</>,
+	multiple = false,
 	value,
 	renderValue = defaultRenderValue,
 	onChange,
@@ -81,7 +98,7 @@ export const Select = <TSelectOption,>({
 	dropdownError,
 	placeholder,
 	notFoundMessage,
-}: ISelectProps<TSelectOption>) => {
+}: TSelectProps<TSelectOption>) => {
 	const id = useId();
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -101,10 +118,13 @@ export const Select = <TSelectOption,>({
 		[setIsOpenState, setIsOpenProp, isOpenProp],
 	);
 
-	const inputValue = useMemo(
-		() => (searchValue !== null ? searchValue : value !== undefined ? renderValue(value) : ''),
-		[value, searchValue],
-	);
+	const inputValue = useMemo(() => {
+		if (searchValue !== null) return searchValue;
+		if (value === undefined) return '';
+		return multiple
+			? (renderValue as (value: TSelectOption[]) => string)(value as TSelectOption[])
+			: (renderValue as (value: TSelectOption) => string)(value as TSelectOption);
+	}, [value, searchValue, multiple]);
 
 	const isSearchable = !!onSearch;
 	const isShowDropdownError = !!dropdownError;
@@ -117,16 +137,19 @@ export const Select = <TSelectOption,>({
 	const handleOpen = () => {
 		setIsOpen(true);
 	};
+
 	const handleClose = () => {
 		setIsOpen(false);
 		if (isSearchable) onSearch(null);
 	};
+
 	const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
 		if (isSearchable) {
 			const { value } = event.target;
 			onSearch(value);
 		}
 	};
+
 	const handleChange = (value: TSelectOption) => {
 		if (onChange && value !== undefined) onChange(value);
 		handleClose();
@@ -211,7 +234,12 @@ export const Select = <TSelectOption,>({
 										{options.map((option) => {
 											const optionValue = getOptionValue(option);
 											const key = getOptionKey ? getOptionKey(option) : optionValue;
-											const isSelected = optionValue === value;
+											const isSelected = multiple
+												? Array.isArray(value) &&
+													value.some((v) => getOptionValue(v) === optionValue)
+												: !Array.isArray(value) &&
+													value !== undefined &&
+													optionValue === getOptionValue(value);
 											return (
 												<li
 													key={key}

@@ -13,7 +13,9 @@ export const App = () => {
 			<PopoverDemo />
 			<DropdownDemo />
 			<SelectDemo />
+			<MultipleSelectDemo />
 			<SelectGenericDemo />
+			<MultipleSelectGenericDemo />
 			<AsyncSelectDemo />
 		</div>
 	);
@@ -143,40 +145,88 @@ const SelectDemo = () => {
 	);
 };
 
-// type TSelectGenericOption = { value: string; label: string };
+const MultipleSelectDemo = () => {
+	const [values, setValues] = useState<string[]>([]);
+	const [searchValue, setSearchValue] = useState<string | null>('');
 
-// const SelectGenericDemo = () => {
-// 	const [value, setValue] = useState<TSelectGenericOption>();
-// 	return (
-// 		<Select<TSelectGenericOption>
-// 			options={[
-// 				{ value: 'Apples', label: '🍎 Apples' },
-// 				{ value: 'Bananas', label: '🍌 Bananas' },
-// 				{ value: 'Broccoli', label: '🥦 Broccoli' },
-// 			]}
-// 			renderValue={(value) => value.value}
-// 			getOptionValue={(option) => option.value}
-// 			getOptionLabel={(option) => option.label}
-// 			value={value}
-// 			onChange={setValue}
-// 			placeholder="Select Generic"
-// 		/>
-// 	);
-// };
+	const filteredOptions = useMemo(() => {
+		if (!searchValue) return options;
+		return options.filter((option) => option.toLowerCase().includes(searchValue.toLowerCase()));
+	}, [options, searchValue]);
 
-type TSelectGenericOption = boolean;
+	const handleChange = (value: string) => {
+		const newValues = [...values];
+		const valueIndex = newValues.findIndex((item) => item === value);
+		if (valueIndex === -1) {
+			newValues.push(value);
+		} else {
+			newValues.splice(valueIndex, 1);
+		}
+		setValues(newValues);
+	};
+
+	return (
+		<Select
+			multiple
+			options={filteredOptions}
+			value={values}
+			onChange={handleChange}
+			searchValue={searchValue}
+			onSearch={setSearchValue}
+			placeholder="Multiple Select"
+		/>
+	);
+};
+
+type TSelectGenericOption = { name: string; label: string };
 
 const SelectGenericDemo = () => {
 	const [value, setValue] = useState<TSelectGenericOption>();
 	return (
 		<Select<TSelectGenericOption>
-			options={[true, false]}
-			renderValue={(value) => String(value)}
-			getOptionValue={(option) => String(option)}
-			getOptionLabel={(option) => String(option)}
+			options={[
+				{ name: 'Apples', label: '🍎 Apples' },
+				{ name: 'Bananas', label: '🍌 Bananas' },
+				{ name: 'Broccoli', label: '🥦 Broccoli' },
+			]}
+			renderValue={(value) => value.label}
+			getOptionValue={(option) => option.name}
+			getOptionLabel={(option) => option.label}
 			value={value}
 			onChange={setValue}
 			placeholder="Select Generic"
+		/>
+	);
+};
+
+const MultipleSelectGenericDemo = () => {
+	const [values, setValues] = useState<TSelectGenericOption[]>([]);
+
+	const handleChange = (value: TSelectGenericOption) => {
+		const newValues = [...values];
+		const valueIndex = newValues.findIndex((item) => item.name === value.name);
+		if (valueIndex === -1) {
+			newValues.push(value);
+		} else {
+			newValues.splice(valueIndex, 1);
+		}
+		setValues(newValues);
+	};
+
+	return (
+		<Select<TSelectGenericOption>
+			multiple
+			options={[
+				{ name: 'Apples', label: '🍎 Apples' },
+				{ name: 'Bananas', label: '🍌 Bananas' },
+				{ name: 'Broccoli', label: '🥦 Broccoli' },
+			]}
+			renderValue={(value) => value.map((item) => item.label).join(', ')}
+			getOptionValue={(option) => option.name}
+			getOptionLabel={(option) => option.label}
+			value={values}
+			onChange={handleChange}
+			placeholder="Multiple Select Generic"
 		/>
 	);
 };
