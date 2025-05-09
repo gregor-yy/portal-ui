@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, Key, ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
 import { Transition } from 'react-transition-group';
 
 import { SYSTEM_TRANSITION_MS_100 } from '@/shared/constants';
@@ -14,6 +14,7 @@ import { Portal } from '../Portal';
 import styles from './Select.module.css';
 
 type TSelectValue = string;
+type TSelectMultipleValue = TSelectValue[];
 
 type TSelectSearchValue = string | null;
 
@@ -24,18 +25,40 @@ type TSelectOption = {
 
 type TSelectClasses = { input?: string; dropdown?: string; list?: string; option?: string; notFound?: string };
 
-const defaultRenderOption = (option: TSelectOption) => option.label;
+function isDefaultSelectOption(option: unknown): option is TSelectOption {
+	return (
+		typeof option === 'object' &&
+		option !== null &&
+		'label' in option &&
+		isString(option.label) &&
+		'value' in option &&
+		isString(option.value)
+	);
+}
 
-interface ISelectProps {
+const defaultGetOptionValue = <T,>(option: T): TSelectValue => {
+	if (isDefaultSelectOption(option)) return option.value;
+	throw new Error('If you are using a non-standard type of options, you must pass the getOptionLabel parameter.');
+};
+
+const defaultGetOptionLabel = <T,>(option: T): string => {
+	if (isDefaultSelectOption(option)) return option.label;
+	throw new Error('If you are using a non-standard type of options, you must pass the getOptionValue parameter.');
+};
+
+interface ISelectProps<T = TSelectOption> {
 	isOpen?: boolean;
 	onOpenChange?: (isOpen: boolean) => void;
 
 	classes?: TSelectClasses;
 
-	options: TSelectOption[];
-	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
+	options: T[];
+	getOptionKey?: (option: T) => Key;
+	getOptionValue?: (option: T) => TSelectValue;
+	getOptionLabel?: (option: T) => string;
+	renderOption?: (option: T, isSelected: boolean) => ReactNode;
 
-	value?: TSelectValue;
+	value?: TSelectValue | TSelectMultipleValue;
 	onChange?: (value: TSelectValue) => void;
 
 	loading?: boolean | ReactNode;
@@ -47,12 +70,15 @@ interface ISelectProps {
 	notFoundMessage?: string;
 }
 
-export const Select: FC<ISelectProps> = ({
+export const Select = <T,>({
 	isOpen: isOpenProp,
 	onOpenChange: setIsOpenProp,
 	classes,
 	options,
-	renderOption = defaultRenderOption,
+	getOptionKey,
+	getOptionValue = defaultGetOptionValue,
+	getOptionLabel = defaultGetOptionLabel,
+	renderOption = (option) => <>{getOptionLabel(option)}</>,
 	value,
 	onChange,
 	loading,
@@ -61,7 +87,7 @@ export const Select: FC<ISelectProps> = ({
 	dropdownError,
 	placeholder,
 	notFoundMessage,
-}) => {
+}: ISelectProps<T>) => {
 	const id = useId();
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -186,18 +212,22 @@ export const Select: FC<ISelectProps> = ({
 										ref={listboxRef}
 									>
 										{options.map((option) => {
-											const isSelected = option.value === value;
+											const optionValue = getOptionValue(option);
+											const key = getOptionKey ? getOptionKey(option) : optionValue;
+											const isSelected = Array.isArray(value)
+												? value.includes(optionValue)
+												: optionValue === value;
 											return (
 												<li
-													key={`${option.value} ${option.label}`}
-													data-value={option.value}
+													key={key}
+													data-value={optionValue}
 													className={classNames(
 														styles.option,
 														{ [styles.selected]: isSelected },
 														classes?.option,
 													)}
 													aria-selected={isSelected}
-													onClick={() => handleChange(option.value)}
+													onClick={() => handleChange(optionValue)}
 													role="option"
 												>
 													{renderOption(option, isSelected)}

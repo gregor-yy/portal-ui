@@ -13,6 +13,8 @@ export const App = () => {
 			<PopoverDemo />
 			<DropdownDemo />
 			<SelectDemo />
+			<SelectMultipleDemo />
+			<SelectGenericDemo />
 			<AsyncSelectDemo />
 		</div>
 	);
@@ -149,6 +151,57 @@ const SelectDemo = () => {
 	);
 };
 
+const SelectMultipleDemo = () => {
+	const [values, setValues] = useState<string[]>([]);
+	const [searchValue, setSearchValue] = useState<string | null>('');
+
+	const filteredOptions = useMemo(() => {
+		if (!searchValue) return options;
+		return options.filter((option) => option.label.toLowerCase().includes(searchValue.toLowerCase()));
+	}, [options, searchValue]);
+
+	const handleChange = (value: string) => {
+		const newValues = [...values];
+		const valueIndex = newValues.findIndex((item) => item === value);
+
+		if (valueIndex === -1) {
+			newValues.push(value);
+		} else {
+			newValues.splice(valueIndex, 1);
+		}
+		setValues(newValues);
+	};
+
+	return (
+		<Select
+			options={filteredOptions}
+			value={values}
+			onChange={handleChange}
+			searchValue={searchValue}
+			onSearch={setSearchValue}
+			placeholder="Multiple Select"
+		/>
+	);
+};
+
+const SelectGenericDemo = () => {
+	const [value, setValue] = useState<string>('');
+	return (
+		<Select<{ name: string; description: string }>
+			options={[
+				{ name: 'Apples', description: '🍎 Apples' },
+				{ name: 'Bananas', description: '🍌 Bananas' },
+				{ name: 'Broccoli', description: '🥦 Broccoli' },
+			]}
+			getOptionValue={(option) => option.name}
+			getOptionLabel={(option) => option.description}
+			value={value}
+			onChange={setValue}
+			placeholder="Select Generic"
+		/>
+	);
+};
+
 const fetchUsers = (nameLike: string | null, signal: AbortSignal) => {
 	return fetch(`https://jsonplaceholder.typicode.com/users${nameLike ? `?name_like=${nameLike}` : ''}`, {
 		signal,
@@ -200,19 +253,14 @@ const AsyncSelectDemo = () => {
 		}
 	}, [isOpen, searchValue]);
 
-	const options = useMemo(() => {
-		return users.map((user) => ({
-			value: user.name,
-			label: `${user.name} (${user.email})`,
-		}));
-	}, [users]);
-
 	return (
-		<Select
+		<Select<User>
 			isOpen={isOpen}
 			onOpenChange={setIsOpen}
 			value={value}
-			options={options}
+			options={users}
+			getOptionValue={(option) => option.id.toString()}
+			getOptionLabel={(option) => option.name}
 			onChange={setValue}
 			searchValue={searchValue}
 			onSearch={setSearchValue}
