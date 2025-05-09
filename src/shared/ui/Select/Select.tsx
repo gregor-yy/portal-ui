@@ -53,8 +53,6 @@ interface ISelectBaseProps<TSelectOption = TDefaultSelectOption> {
 	getOptionLabel?: (option: TSelectOption) => string;
 	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
 
-	onChange?: (option: TSelectOption) => void;
-
 	loading?: boolean | ReactNode;
 	searchValue?: TSelectSearchValue;
 	onSearch?: (value: TSelectSearchValue) => void;
@@ -68,12 +66,14 @@ interface ISelectBaseProps<TSelectOption = TDefaultSelectOption> {
 interface ISingleSelectProps<TSelectOption> extends ISelectBaseProps<TSelectOption> {
 	multiple?: false;
 	value?: TSelectOption;
+	onChange?: (option: TSelectOption) => void;
 	renderValue?: (option: TSelectOption) => string;
 }
 
 interface IMultipleSelectProps<TSelectOption> extends ISelectBaseProps<TSelectOption> {
 	multiple: true;
 	value?: TSelectOption[];
+	onChange?: (option: TSelectOption[]) => void;
 	renderValue?: (option: TSelectOption[]) => string;
 }
 
@@ -150,8 +150,21 @@ export const Select = <TSelectOption,>({
 		}
 	};
 
-	const handleChange = (value: TSelectOption) => {
-		if (onChange && value !== undefined) onChange(value);
+	const handleChange = (newValue: TSelectOption) => {
+		if (onChange) {
+			if (multiple) {
+				const newValues = [...(value as TSelectOption[])];
+				const newValueIndex = newValues.findIndex((item) => getOptionValue(item) === getOptionValue(newValue));
+				if (newValueIndex === -1) {
+					newValues.push(newValue);
+				} else {
+					newValues.splice(newValueIndex, 1);
+				}
+				(onChange as (value: TSelectOption[]) => void)(newValues);
+			} else {
+				(onChange as (value: TSelectOption) => void)(newValue);
+			}
+		}
 		handleClose();
 	};
 

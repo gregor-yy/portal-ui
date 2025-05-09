@@ -7,11 +7,13 @@ import styles from './App.module.css';
 export const App = () => {
 	return (
 		<div className={styles.container}>
-			<ModalDemo />
-			<DrawerDemo />
-			<TooltipDemo />
-			<PopoverDemo />
-			<DropdownDemo />
+			<div style={{ display: 'none' }}>
+				<ModalDemo />
+				<DrawerDemo />
+				<TooltipDemo />
+				<PopoverDemo />
+				<DropdownDemo />
+			</div>
 			<SelectDemo />
 			<MultipleSelectDemo />
 			<SelectGenericDemo />
@@ -154,23 +156,12 @@ const MultipleSelectDemo = () => {
 		return options.filter((option) => option.toLowerCase().includes(searchValue.toLowerCase()));
 	}, [options, searchValue]);
 
-	const handleChange = (value: string) => {
-		const newValues = [...values];
-		const valueIndex = newValues.findIndex((item) => item === value);
-		if (valueIndex === -1) {
-			newValues.push(value);
-		} else {
-			newValues.splice(valueIndex, 1);
-		}
-		setValues(newValues);
-	};
-
 	return (
-		<Select
+		<Select<string>
 			multiple
 			options={filteredOptions}
 			value={values}
-			onChange={handleChange}
+			onChange={setValues}
 			searchValue={searchValue}
 			onSearch={setSearchValue}
 			placeholder="Multiple Select"
@@ -202,17 +193,6 @@ const SelectGenericDemo = () => {
 const MultipleSelectGenericDemo = () => {
 	const [values, setValues] = useState<TSelectGenericOption[]>([]);
 
-	const handleChange = (value: TSelectGenericOption) => {
-		const newValues = [...values];
-		const valueIndex = newValues.findIndex((item) => item.name === value.name);
-		if (valueIndex === -1) {
-			newValues.push(value);
-		} else {
-			newValues.splice(valueIndex, 1);
-		}
-		setValues(newValues);
-	};
-
 	return (
 		<Select<TSelectGenericOption>
 			multiple
@@ -225,7 +205,7 @@ const MultipleSelectGenericDemo = () => {
 			getOptionValue={(option) => option.name}
 			getOptionLabel={(option) => option.label}
 			value={values}
-			onChange={handleChange}
+			onChange={setValues}
 			placeholder="Multiple Select Generic"
 		/>
 	);
