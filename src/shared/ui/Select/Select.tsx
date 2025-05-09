@@ -13,53 +13,46 @@ import { Portal } from '../Portal';
 
 import styles from './Select.module.css';
 
-type TSelectValue = string;
-type TSelectMultipleValue = TSelectValue[];
-
 type TSelectSearchValue = string | null;
 
-type TSelectOption = {
-	value: TSelectValue;
-	label: string;
-};
+type TDefaultSelectOption = string;
 
 type TSelectClasses = { input?: string; dropdown?: string; list?: string; option?: string; notFound?: string };
 
-function isDefaultSelectOption(option: unknown): option is TSelectOption {
-	return (
-		typeof option === 'object' &&
-		option !== null &&
-		'label' in option &&
-		isString(option.label) &&
-		'value' in option &&
-		isString(option.value)
-	);
+function isDefaultSelectOption(option: unknown): option is TDefaultSelectOption {
+	return typeof option === 'string';
 }
 
-const defaultGetOptionValue = <T,>(option: T): TSelectValue => {
-	if (isDefaultSelectOption(option)) return option.value;
-	throw new Error('If you are using a non-standard type of options, you must pass the getOptionLabel parameter.');
+const defaultGetOptionValue = <TSelectOption,>(option: TSelectOption): string => {
+	if (isDefaultSelectOption(option)) return option;
+	throw new Error('If you are not using a `string` type of options, you must pass the `getOptionLabel` parameter.');
 };
 
-const defaultGetOptionLabel = <T,>(option: T): string => {
-	if (isDefaultSelectOption(option)) return option.label;
-	throw new Error('If you are using a non-standard type of options, you must pass the getOptionValue parameter.');
+const defaultGetOptionLabel = <TSelectOption,>(option: TSelectOption): string => {
+	if (isDefaultSelectOption(option)) return option;
+	throw new Error('If you are not using a `string` type of options, you must pass the `getOptionValue` parameter.');
 };
 
-interface ISelectProps<T = TSelectOption> {
+const defaultRenderValue = <TSelectOption,>(value: TSelectOption): string => {
+	if (isDefaultSelectOption(value)) return value;
+	throw new Error('If you are not using a `string` type of options, you must pass the `renderValue` parameter.');
+};
+
+interface ISelectProps<TSelectOption = TDefaultSelectOption> {
 	isOpen?: boolean;
 	onOpenChange?: (isOpen: boolean) => void;
 
 	classes?: TSelectClasses;
 
-	options: T[];
-	getOptionKey?: (option: T) => Key;
-	getOptionValue?: (option: T) => TSelectValue;
-	getOptionLabel?: (option: T) => string;
-	renderOption?: (option: T, isSelected: boolean) => ReactNode;
+	options: TSelectOption[];
+	getOptionKey?: (option: TSelectOption) => Key;
+	getOptionValue?: (option: TSelectOption) => string;
+	getOptionLabel?: (option: TSelectOption) => string;
+	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
 
-	value?: TSelectValue | TSelectMultipleValue;
-	onChange?: (value: TSelectValue) => void;
+	value?: TSelectOption;
+	renderValue?: (option: TSelectOption) => string;
+	onChange?: (option: TSelectOption) => void;
 
 	loading?: boolean | ReactNode;
 	searchValue?: TSelectSearchValue;
@@ -70,7 +63,7 @@ interface ISelectProps<T = TSelectOption> {
 	notFoundMessage?: string;
 }
 
-export const Select = <T,>({
+export const Select = <TSelectOption,>({
 	isOpen: isOpenProp,
 	onOpenChange: setIsOpenProp,
 	classes,
@@ -80,6 +73,7 @@ export const Select = <T,>({
 	getOptionLabel = defaultGetOptionLabel,
 	renderOption = (option) => <>{getOptionLabel(option)}</>,
 	value,
+	renderValue = defaultRenderValue,
 	onChange,
 	loading,
 	searchValue = null,
@@ -87,7 +81,7 @@ export const Select = <T,>({
 	dropdownError,
 	placeholder,
 	notFoundMessage,
-}: ISelectProps<T>) => {
+}: ISelectProps<TSelectOption>) => {
 	const id = useId();
 	const transitionRef = useRef<HTMLDivElement | null>(null);
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -107,7 +101,10 @@ export const Select = <T,>({
 		[setIsOpenState, setIsOpenProp, isOpenProp],
 	);
 
-	const inputValue = useMemo(() => (searchValue !== null ? searchValue : value), [value, searchValue]);
+	const inputValue = useMemo(
+		() => (searchValue !== null ? searchValue : value !== undefined ? renderValue(value) : ''),
+		[value, searchValue],
+	);
 
 	const isSearchable = !!onSearch;
 	const isShowDropdownError = !!dropdownError;
@@ -130,8 +127,8 @@ export const Select = <T,>({
 			onSearch(value);
 		}
 	};
-	const handleChange = (value: TSelectValue) => {
-		if (onChange && value) onChange(value);
+	const handleChange = (value: TSelectOption) => {
+		if (onChange && value !== undefined) onChange(value);
 		handleClose();
 	};
 
@@ -227,7 +224,7 @@ export const Select = <T,>({
 														classes?.option,
 													)}
 													aria-selected={isSelected}
-													onClick={() => handleChange(optionValue)}
+													onClick={() => handleChange(option)}
 													role="option"
 												>
 													{renderOption(option, isSelected)}

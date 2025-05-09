@@ -13,7 +13,6 @@ export const App = () => {
 			<PopoverDemo />
 			<DropdownDemo />
 			<SelectDemo />
-			<SelectMultipleDemo />
 			<SelectGenericDemo />
 			<AsyncSelectDemo />
 		</div>
@@ -121,14 +120,7 @@ const DropdownDemo = () => {
 	);
 };
 
-const options = [
-	{ value: 'Apples', label: '🍎 Apples' },
-	{ value: 'Bananas', label: '🍌 Bananas' },
-	{ value: 'Broccoli', label: '🥦 Broccoli' },
-	{ value: 'Carrots', label: '🥕 Carrots' },
-	{ value: 'Chocolate', label: '🍫 Chocolate' },
-	{ value: 'Grapes', label: '🍇 Grapes' },
-];
+const options = ['🍎 Apples', '🍌 Bananas', '🥦 Broccoli', '🥕 Carrots', '🍫 Chocolate', '🍇 Grapes'];
 
 const SelectDemo = () => {
 	const [value, setValue] = useState<string>('');
@@ -136,7 +128,7 @@ const SelectDemo = () => {
 
 	const filteredOptions = useMemo(() => {
 		if (!searchValue) return options;
-		return options.filter((option) => option.label.toLowerCase().includes(searchValue.toLowerCase()));
+		return options.filter((option) => option.toLowerCase().includes(searchValue.toLowerCase()));
 	}, [options, searchValue]);
 
 	return (
@@ -151,50 +143,37 @@ const SelectDemo = () => {
 	);
 };
 
-const SelectMultipleDemo = () => {
-	const [values, setValues] = useState<string[]>([]);
-	const [searchValue, setSearchValue] = useState<string | null>('');
+// type TSelectGenericOption = { value: string; label: string };
 
-	const filteredOptions = useMemo(() => {
-		if (!searchValue) return options;
-		return options.filter((option) => option.label.toLowerCase().includes(searchValue.toLowerCase()));
-	}, [options, searchValue]);
+// const SelectGenericDemo = () => {
+// 	const [value, setValue] = useState<TSelectGenericOption>();
+// 	return (
+// 		<Select<TSelectGenericOption>
+// 			options={[
+// 				{ value: 'Apples', label: '🍎 Apples' },
+// 				{ value: 'Bananas', label: '🍌 Bananas' },
+// 				{ value: 'Broccoli', label: '🥦 Broccoli' },
+// 			]}
+// 			renderValue={(value) => value.value}
+// 			getOptionValue={(option) => option.value}
+// 			getOptionLabel={(option) => option.label}
+// 			value={value}
+// 			onChange={setValue}
+// 			placeholder="Select Generic"
+// 		/>
+// 	);
+// };
 
-	const handleChange = (value: string) => {
-		const newValues = [...values];
-		const valueIndex = newValues.findIndex((item) => item === value);
-
-		if (valueIndex === -1) {
-			newValues.push(value);
-		} else {
-			newValues.splice(valueIndex, 1);
-		}
-		setValues(newValues);
-	};
-
-	return (
-		<Select
-			options={filteredOptions}
-			value={values}
-			onChange={handleChange}
-			searchValue={searchValue}
-			onSearch={setSearchValue}
-			placeholder="Multiple Select"
-		/>
-	);
-};
+type TSelectGenericOption = boolean;
 
 const SelectGenericDemo = () => {
-	const [value, setValue] = useState<string>('');
+	const [value, setValue] = useState<TSelectGenericOption>();
 	return (
-		<Select<{ name: string; description: string }>
-			options={[
-				{ name: 'Apples', description: '🍎 Apples' },
-				{ name: 'Bananas', description: '🍌 Bananas' },
-				{ name: 'Broccoli', description: '🥦 Broccoli' },
-			]}
-			getOptionValue={(option) => option.name}
-			getOptionLabel={(option) => option.description}
+		<Select<TSelectGenericOption>
+			options={[true, false]}
+			renderValue={(value) => String(value)}
+			getOptionValue={(option) => String(option)}
+			getOptionLabel={(option) => String(option)}
 			value={value}
 			onChange={setValue}
 			placeholder="Select Generic"
@@ -226,7 +205,7 @@ type User = {
 };
 
 const AsyncSelectDemo = () => {
-	const [value, setValue] = useState<string>('');
+	const [value, setValue] = useState<User>();
 	const [searchValue, setSearchValue] = useState<string | null>(null);
 	const [users, setUsers] = useState<User[]>([]);
 	const [isOpen, setIsOpen] = useState(false);
@@ -259,6 +238,7 @@ const AsyncSelectDemo = () => {
 			onOpenChange={setIsOpen}
 			value={value}
 			options={users}
+			renderValue={(option) => option.name}
 			getOptionValue={(option) => option.id.toString()}
 			getOptionLabel={(option) => option.name}
 			onChange={setValue}
