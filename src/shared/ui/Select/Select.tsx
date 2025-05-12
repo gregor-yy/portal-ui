@@ -125,11 +125,8 @@ export const Select = <TSelectOption,>({
 	const isOpen = useMemo(() => (isOpenProp !== undefined ? isOpenProp : isOpenState), [isOpenState, isOpenProp]);
 	const setIsOpen = useCallback(
 		(isOpen: boolean) => {
-			if (isOpenProp !== undefined) {
-				if (setIsOpenProp) setIsOpenProp(isOpen);
-			} else {
-				setIsOpenState(isOpen);
-			}
+			if (setIsOpenProp) setIsOpenProp(isOpen);
+			else setIsOpenState(isOpen);
 		},
 		[setIsOpenState, setIsOpenProp, isOpenProp],
 	);
