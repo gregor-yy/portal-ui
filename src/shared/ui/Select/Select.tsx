@@ -39,9 +39,9 @@ const handleNotStandardOption = (propName: string): string => {
 	return '';
 };
 
-const defaultGetOptionValue = <TSelectOption,>(option: TSelectOption): string => {
+const defaultGetOptionKey = <TSelectOption,>(option: TSelectOption): string => {
 	if (isDefaultSelectOption(option)) return option;
-	return handleNotStandardOption('getOptionLabel');
+	return handleNotStandardOption('getOptionKey');
 };
 
 const defaultGetOptionLabel = <TSelectOption,>(option: TSelectOption): string => {
@@ -65,7 +65,6 @@ interface ISelectBaseProps<TSelectOption = TDefaultSelectOption> {
 
 	options: TSelectOption[];
 	getOptionKey?: (option: TSelectOption) => Key;
-	getOptionValue?: (option: TSelectOption) => string;
 	getOptionLabel?: (option: TSelectOption) => string;
 	renderOption?: (option: TSelectOption, isSelected: boolean) => ReactNode;
 
@@ -100,8 +99,7 @@ export const Select = <TSelectOption,>({
 	onOpenChange: setIsOpenProp,
 	classes,
 	options,
-	getOptionKey,
-	getOptionValue = defaultGetOptionValue,
+	getOptionKey = defaultGetOptionKey,
 	getOptionLabel = defaultGetOptionLabel,
 	renderOption = (option) => <>{getOptionLabel(option)}</>,
 	multiple = false,
@@ -168,7 +166,7 @@ export const Select = <TSelectOption,>({
 		if (onChange) {
 			if (multiple) {
 				const newValues = [...(value as TSelectOption[])];
-				const newValueIndex = newValues.findIndex((item) => getOptionValue(item) === getOptionValue(newValue));
+				const newValueIndex = newValues.findIndex((item) => getOptionKey(item) === getOptionKey(newValue));
 				if (newValueIndex === -1) {
 					newValues.push(newValue);
 				} else {
@@ -259,18 +257,15 @@ export const Select = <TSelectOption,>({
 										ref={listboxRef}
 									>
 										{options.map((option) => {
-											const optionValue = getOptionValue(option);
-											const key = getOptionKey ? getOptionKey(option) : optionValue;
+											const key = getOptionKey(option);
 											const isSelected = multiple
-												? Array.isArray(value) &&
-													value.some((v) => getOptionValue(v) === optionValue)
+												? Array.isArray(value) && value.some((v) => getOptionKey(v) === key)
 												: !Array.isArray(value) &&
 													value !== undefined &&
-													optionValue === getOptionValue(value);
+													key === getOptionKey(value);
 											return (
 												<li
 													key={key}
-													data-value={optionValue}
 													className={classNames(
 														styles.option,
 														{ [styles.selected]: isSelected },

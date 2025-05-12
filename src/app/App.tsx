@@ -7,13 +7,11 @@ import styles from './App.module.css';
 export const App = () => {
 	return (
 		<div className={styles.container}>
-			<div style={{ display: 'none' }}>
-				<ModalDemo />
-				<DrawerDemo />
-				<TooltipDemo />
-				<PopoverDemo />
-				<DropdownDemo />
-			</div>
+			<ModalDemo />
+			<DrawerDemo />
+			<TooltipDemo />
+			<PopoverDemo />
+			<DropdownDemo />
 			<SelectDemo />
 			<MultipleSelectDemo />
 			<SelectGenericDemo />
@@ -181,7 +179,7 @@ const SelectGenericDemo = () => {
 				{ name: 'Broccoli', label: '🥦 Broccoli' },
 			]}
 			renderValue={(value) => value.label}
-			getOptionValue={(option) => option.name}
+			getOptionKey={(option) => option.name}
 			getOptionLabel={(option) => option.label}
 			value={value}
 			onChange={setValue}
@@ -202,7 +200,7 @@ const MultipleSelectGenericDemo = () => {
 				{ name: 'Broccoli', label: '🥦 Broccoli' },
 			]}
 			renderValue={(value) => value.map((item) => item.label).join(', ')}
-			getOptionValue={(option) => option.name}
+			getOptionKey={(option) => option.name}
 			getOptionLabel={(option) => option.label}
 			value={values}
 			onChange={setValues}
@@ -269,7 +267,7 @@ const AsyncSelectDemo = () => {
 			value={value}
 			options={users}
 			renderValue={(option) => option.name}
-			getOptionValue={(option) => option.id.toString()}
+			getOptionKey={(option) => option.id.toString()}
 			getOptionLabel={(option) => option.name}
 			onChange={setValue}
 			searchValue={searchValue}
