@@ -149,6 +149,7 @@ export const Select = <TSelectOption,>({
 
 	const handleOpen = () => {
 		setIsOpen(true);
+		if (isSearchable) onSearch('');
 	};
 
 	const handleClose = () => {
