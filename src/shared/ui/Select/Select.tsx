@@ -23,14 +23,30 @@ function isDefaultSelectOption(option: unknown): option is TDefaultSelectOption 
 	return typeof option === 'string';
 }
 
+const isDevelopmentMode = process.env.NODE_ENV === 'development';
+
+const getNotStandardOptionError = (propName: string): string =>
+	`If you are not using a 'string' type of options, you must pass the '${propName}' parameter.`;
+
+const handleNotStandardOption = (propName: string): string => {
+	const error = getNotStandardOptionError(propName);
+
+	if (isDevelopmentMode) {
+		throw new Error(error);
+	}
+
+	console.error(error);
+	return '';
+};
+
 const defaultGetOptionValue = <TSelectOption,>(option: TSelectOption): string => {
 	if (isDefaultSelectOption(option)) return option;
-	throw new Error('If you are not using a `string` type of options, you must pass the `getOptionLabel` parameter.');
+	return handleNotStandardOption('getOptionLabel');
 };
 
 const defaultGetOptionLabel = <TSelectOption,>(option: TSelectOption): string => {
 	if (isDefaultSelectOption(option)) return option;
-	throw new Error('If you are not using a `string` type of options, you must pass the `getOptionValue` parameter.');
+	return handleNotStandardOption('getOptionValue');
 };
 
 const defaultRenderValue = <TSelectOption,>(value: TSelectOption): string => {
@@ -38,7 +54,7 @@ const defaultRenderValue = <TSelectOption,>(value: TSelectOption): string => {
 		return value.map((item) => (isDefaultSelectOption(item) ? item : '')).join(', ');
 	}
 	if (isDefaultSelectOption(value)) return value;
-	throw new Error('If you are not using a `string` type of options, you must pass the `renderValue` parameter.');
+	return handleNotStandardOption('renderValue');
 };
 
 interface ISelectBaseProps<TSelectOption = TDefaultSelectOption> {
