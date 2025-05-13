@@ -1,0 +1,35 @@
+.container {
+	stroke: var(--system-color-light-500);
+}
+
+.container g {
+	transform-origin: center;
+	animation: spinnerBody 2s linear infinite;
+}
+
+.container g circle {
+	stroke-linecap: round;
+	animation: spinnerCircle 1.5s ease-in-out infinite;
+}
+
+@keyframes spinnerBody {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes spinnerCircle {
+	0% {
+		stroke-dasharray: 0 150;
+		stroke-dashoffset: 0;
+	}
+	47.5% {
+		stroke-dasharray: 42 150;
+		stroke-dashoffset: -16;
+	}
+	95%,
+	100% {
+		stroke-dasharray: 42 150;
+		stroke-dashoffset: -59;
+	}
+}

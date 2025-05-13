@@ -1,0 +1,82 @@
+.anchor {
+	position: relative;
+}
+
+.container {
+	pointer-events: none;
+}
+
+.container.enter {
+	pointer-events: inherit;
+}
+
+.backdrop {
+	background-color: transparent;
+}
+
+.body {
+	max-height: 300px;
+	overflow-x: auto;
+	padding: var(--system-spacing-200) 0;
+}
+
+.body.hidden {
+	display: none;
+}
+
+.list {
+	list-style: none;
+}
+
+.option {
+	cursor: pointer;
+	padding: var(--system-spacing-300) var(--system-spacing-400);
+}
+
+.option:hover {
+	background-color: var(--system-color-dark-400);
+}
+
+.option.selected {
+	background-color: var(--system-color-dark-300);
+}
+
+.field {
+	width: 100%;
+	height: 100%;
+	padding-right: var(--system-spacing-1000);
+}
+
+.chevron {
+	position: absolute;
+	pointer-events: none;
+	right: var(--system-spacing-300);
+	top: 50%;
+	transform: translateY(-50%);
+	fill: none;
+	stroke: var(--system-color-dark-500);
+	width: 24px;
+	height: 24px;
+}
+
+.loaderContainer {
+	display: flex;
+	justify-content: center;
+	padding: var(--system-spacing-400) 0;
+}
+
+.loader {
+	width: 32px;
+	height: 32px;
+}
+
+.notFound {
+	padding: var(--system-spacing-400);
+	text-align: center;
+}
+
+.dropdownError {
+	padding: var(--system-spacing-400);
+	text-align: center;
+	color: var(--system-color-danger-500);
+}

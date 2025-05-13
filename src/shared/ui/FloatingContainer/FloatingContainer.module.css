@@ -1,16 +1,18 @@
 .container {
-    pointer-events: none;
-    position: absolute;
-    color: var(--system-color-light-500);
-    background-color: var(--system-color-dark-500);
-    transform: scale(0.9);
-    opacity: 0;
-    transition: opacity var(--system-transition-100), transform var(--system-transition-100);
-    border-radius: var(--system-radius-100);
+	pointer-events: none;
+	position: absolute;
+	color: var(--system-color-light-500);
+	background-color: var(--system-color-dark-500);
+	transform: scale(0.9);
+	opacity: 0;
+	transition:
+		opacity var(--system-transition-100),
+		transform var(--system-transition-100);
+	border-radius: var(--system-radius-100);
 }
 
 .container.enter {
-    opacity: 1;
-    transform: scale(1);
-    pointer-events: inherit;
+	opacity: 1;
+	transform: scale(1);
+	pointer-events: inherit;
 }

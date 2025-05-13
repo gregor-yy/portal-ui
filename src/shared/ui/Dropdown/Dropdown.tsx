@@ -29,7 +29,7 @@ interface ITriggerProps {
 	children: (props: TTriggerChildrenProps) => ReactElement;
 }
 
-export const Trigger: FC<ITriggerProps> = ({ children }) => {
+const Trigger: FC<ITriggerProps> = ({ children }) => {
 	const { triggerId } = useSelector((store) => store);
 	const update = useUpdate();
 
@@ -46,7 +46,7 @@ interface IItemProps {
 	className?: string;
 }
 
-export const Item: FC<IItemProps> = ({ children, onClick, className }) => {
+const Item: FC<IItemProps> = ({ children, onClick, className }) => {
 	const update = useUpdate();
 
 	const handleSelect = () => {
@@ -86,7 +86,7 @@ interface IMenuProps {
 	className?: string;
 }
 
-export const Menu: FC<IMenuProps> = ({
+const Menu: FC<IMenuProps> = ({
 	isOpen: isOpenProp = false,
 	children,
 	anchorPlacement = 'bottom-center',
@@ -139,10 +139,10 @@ export const Menu: FC<IMenuProps> = ({
 
 type TMenu = typeof Menu;
 
-type IDropdownChild = ReactElement<TTrigger> | ReactElement<TMenu>;
+type TDropdownChild = ReactElement<TTrigger> | ReactElement<TMenu>;
 
 interface IDropdownProps {
-	children: IDropdownChild | IDropdownChild[];
+	children: TDropdownChild | TDropdownChild[];
 }
 
 export const Dropdown: FC<IDropdownProps> & {

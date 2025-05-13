@@ -1,0 +1,7 @@
+.container {
+	cursor: pointer;
+	padding: var(--system-spacing-400);
+	border-radius: var(--system-radius-100);
+	background-color: var(--system-color-action-500);
+	color: var(--system-color-light-500);
+}

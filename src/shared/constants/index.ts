@@ -1,3 +1,3 @@
 export const DEFAULT_TOOLTIP_OFFSET_PX = 12;
 
-export const SYSTEM_TRANSITION_MS_100 = 500
+export const SYSTEM_TRANSITION_MS_100 = 200;

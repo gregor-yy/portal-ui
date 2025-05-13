@@ -6,9 +6,12 @@ import { useAppSelector, useAppUpdate } from '../store';
 interface IUseDialogStackProps {
 	isOpen: boolean;
 	onClose?: () => void;
+	inert?: boolean;
 }
 
-export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
+const root = document.getElementById('root');
+
+export const useDialog = ({ isOpen, onClose, inert = true }: IUseDialogStackProps) => {
 	const id = useId();
 	const stack = useAppSelector((store) => store.dialogStack);
 	const update = useAppUpdate();
@@ -40,6 +43,7 @@ export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
 	useLayoutEffect(() => {
 		if (!isOpen) return;
 
+		const previousInert = root?.inert;
 		const previousOverflow = document.body.style.overflow;
 		const previousInlinePaddingRight = document.body.style.paddingRight;
 		const previousPaddingRight = parseInt(window.getComputedStyle(document.body).getPropertyValue('padding-right'));
@@ -48,14 +52,16 @@ export const useDialog = ({ isOpen, onClose }: IUseDialogStackProps) => {
 		document.body.style.overflow = 'hidden';
 		document.body.style.paddingRight = `${previousPaddingRight + scrollbarWidth}px`;
 
-		const root = document.getElementById('root');
-		if (root) root.inert = true;
+		if (root && inert) root.inert = true;
 
 		return () => {
 			document.body.style.overflow = previousOverflow;
 			document.body.style.paddingRight = previousInlinePaddingRight;
 
-			if (root) root.removeAttribute('inert');
+			if (root && inert) {
+				if (previousInert) root.inert = previousInert;
+				else root.removeAttribute('inert');
+			}
 		};
 	}, [isOpen]);
 };
